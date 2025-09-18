@@ -19,6 +19,8 @@ public class InputManager : MonoBehaviour
     public event Action SpacePressed;
     public event Action SpaceReleased;
     public event Action HitClick;
+    public event Action DoPlant;
+    public event Action<int> ChangeModeType;
 
     [SerializeField] public bool isDragging = false; // 드래그 여부
     [SerializeField] public bool isClick = false; // 클릭 여부
@@ -61,18 +63,9 @@ public class InputManager : MonoBehaviour
         playerInput.Player.HorizontalRight.canceled += OffPressD;
         playerInput.Player.MovementHoriAxis.performed += OnHoriAxis;
         playerInput.Player.MovementHoriAxis.canceled += OnHoriAxis;
+        playerInput.Player.Interaction.performed += OnInteract;
+        // playerInput.Player.ModeSwitch.performed += SwitchMode;
 
-        /*
-        // 대각선 무시
-        playerInput.Player.VerticalUp.performed += OnMoveUp;
-        playerInput.Player.VerticalUp.canceled += OnMoveUpCanceled;
-        playerInput.Player.VerticalDown.performed += OnMoveDown;
-        playerInput.Player.VerticalDown.canceled += OnMoveDownCanceled;
-        playerInput.Player.HorizontalLeft.performed += OnMoveLeft;
-        playerInput.Player.HorizontalLeft.canceled += OnMoveLeftCanceled;
-        playerInput.Player.HorizontalRight.performed += OnMoveRight;
-        playerInput.Player.HorizontalRight.canceled += OnMoveRightCanceled;
-        */
     }
 
     private void OnDisable()
@@ -90,19 +83,8 @@ public class InputManager : MonoBehaviour
         playerInput.Player.HorizontalRight.canceled -= OffPressD;
         playerInput.Player.MovementHoriAxis.performed -= OnHoriAxis;
         playerInput.Player.MovementHoriAxis.canceled -= OnHoriAxis;
-
-
-        /*
-        // 대각선 무시
-        playerInput.Player.VerticalUp.performed -= OnMoveUp;
-        playerInput.Player.VerticalUp.canceled -= OnMoveUpCanceled;
-        playerInput.Player.VerticalDown.performed -= OnMoveDown;
-        playerInput.Player.VerticalDown.canceled -= OnMoveDownCanceled;
-        playerInput.Player.HorizontalLeft.performed -= OnMoveLeft;
-        playerInput.Player.HorizontalLeft.canceled -= OnMoveLeftCanceled;
-        playerInput.Player.HorizontalRight.performed -= OnMoveRight;
-        playerInput.Player.HorizontalRight.canceled -= OnMoveRightCanceled;
-        */
+        playerInput.Player.Interaction.performed -= OnInteract;
+        // playerInput.Player.ModeSwitch.performed -= SwitchMode;
 
         playerInput.Player.Disable();
     }
@@ -205,17 +187,7 @@ public class InputManager : MonoBehaviour
         
         if (hit.collider != null)
         {
-            if (hit.collider.CompareTag("Blocking"))
-            { return; }
-            if (hit.collider.CompareTag("Clickable"))
-            {
-                
-                
-            }
-            if (hit.collider.CompareTag("HitTarget"))
-            {
-               
-            }
+           
         }
     }
 
@@ -268,12 +240,7 @@ public class InputManager : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(mainCamera.ScreenToWorldPoint(mouseScreenPos), Vector2.zero);
         if (hit.collider != null)
         {
-            if (hit.collider.CompareTag("Draggable"))
-            {
-                draggedObject = hit.collider.gameObject; // 현재 드래그 중인 오브젝트
-                Debug.Log("드래그");
-                isDragging = true;
-            }
+            
         } 
         
     }
@@ -341,5 +308,19 @@ public class InputManager : MonoBehaviour
     {
         float movement = context.ReadValue<float>();
         MovementAD?.Invoke(movement);
+    }
+    private void OnInteract(InputAction.CallbackContext context)
+    {
+        Debug.Log("Interact Pressed");
+
+        DoPlant?.Invoke();
+        
+    }
+
+    private void SwitchMode(InputAction.CallbackContext context)
+    {
+        int modeType = (int)context.ReadValue<float>();
+        ChangeModeType?.Invoke(modeType);
+        Debug.Log("Mode Switch to " + modeType);
     }
 }

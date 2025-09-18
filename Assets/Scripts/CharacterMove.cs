@@ -64,7 +64,7 @@ public class CharacterMove : MonoBehaviour
         jump = GetComponent<CharacterJump>(); // 추가
     }
 
-    private void OnEnable()
+    private void Start()
     {
         InputManager.Instance.MovementAD += OnMovement;
     }
