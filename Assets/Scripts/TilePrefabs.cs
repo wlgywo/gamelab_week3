@@ -10,13 +10,28 @@ public class TilePrefabs : MonoBehaviour
     public Material wateredMaterial;
     public Material defaultMaterial;
 
+    public bool isOccupiedByGiantCrop = false; // 거대 작물 여부
+    public bool isWateredToday = false;
+    public CropBehaviour GetContainedCrop()
+    {
+        if (isSeedSpawned)
+        {
+            return GetComponentInChildren<CropBehaviour>();
+        }
+        return null;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
         TimeManager.Instance.OnDayEnd += DayChangeHappend;
         WeatherManager.Instance.OnRainStarted += GetWet;
         WeatherManager.Instance.OnRainStopped += Dry;
+        // GiantCropManager가 존재할 때만 자신을 등록합니다.
+        if (GiantCropManager.Instance != null)
+        {
+            GiantCropManager.Instance.RegisterTile(this);
+        }
     }
 
     private void OnDisable()
@@ -26,6 +41,11 @@ public class TilePrefabs : MonoBehaviour
             TimeManager.Instance.OnDayEnd -= DayChangeHappend;
             WeatherManager.Instance.OnRainStarted -= GetWet;
             WeatherManager.Instance.OnRainStopped -= Dry;
+        }
+        // GiantCropManager가 존재할 때만 자신을 등록 해제합니다.
+        if (GiantCropManager.Instance != null)
+        {
+            GiantCropManager.Instance.UnregisterTile(this);
         }
     }
 
@@ -39,6 +59,7 @@ public class TilePrefabs : MonoBehaviour
     {
         GetComponent<SpriteRenderer>().material = wateredMaterial;
         isWatered = true;
+        isWateredToday = true;
     }
 
     public void GetWetByPlayer()
@@ -47,12 +68,14 @@ public class TilePrefabs : MonoBehaviour
         {
             GetComponent<SpriteRenderer>().material = wateredMaterial;
             isWatered = true;
+            isWateredToday = true;
         }
     }
     private void Dry()
     {
         GetComponent<SpriteRenderer>().material = defaultMaterial;
         isWatered = false;
+        isWateredToday = false;
     }
     public void DayChangeHappend(int newDay)
     {

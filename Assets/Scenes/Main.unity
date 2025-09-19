@@ -700,18 +700,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4738967644171749759, guid: c6f33d70fbb287048ad09ec107fb10d8, type: 3}
   m_PrefabInstance: {fileID: 6203764879689730161}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &160451344
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 160451334}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae1b1ee8c41e7cb4ba13b895f336e81b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &160451351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2764,6 +2752,7 @@ GameObject:
   - component: {fileID: 910944551}
   - component: {fileID: 910944552}
   - component: {fileID: 910944553}
+  - component: {fileID: 910944554}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -2906,6 +2895,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerMoney: 0
+--- !u!114 &910944554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910944545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61d533b3a1b68ed4fba0ee6aa7ac9623, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  giantParsnipPrefab: {fileID: 497801509497340413, guid: 20669487f03708243bcc25811957d776, type: 3}
+  giantCropChance: 1
 --- !u!1 &957923527
 GameObject:
   m_ObjectHideFlags: 0
@@ -14892,9 +14895,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2761864824782703109, guid: c6f33d70fbb287048ad09ec107fb10d8, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 160451344}
     - targetCorrespondingSourceObject: {fileID: 2761864824782703109, guid: c6f33d70fbb287048ad09ec107fb10d8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 160451358}

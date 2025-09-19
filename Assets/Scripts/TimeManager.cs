@@ -43,6 +43,7 @@ public class TimeManager : MonoBehaviour
             {
                 CurrentHour = 0; 
                 CurrentDay++;
+                GiantCropManager.Instance.CheckForGiantCrops();
                 OnDayEnd?.Invoke(CurrentDay);
                 OnDayStart?.Invoke(CurrentDay);
             }

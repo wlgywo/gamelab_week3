@@ -212,8 +212,10 @@ public class CharacterFarm : MonoBehaviour
         }
 
         if (crop==null || !crop.IsFullyGrown()) return;
-
-        CropManager.Instance.harvestAmountParsnip++;
+        if( crop.cropData.cropName == "Parsnip") 
+            CropManager.Instance.harvestAmountParsnip++;
+        if (crop.cropData.cropName == "GiantParsnip")
+            CropManager.Instance.harvestAmountParsnip+=5;
         UIManager.Instance.UpdateHarvestText();
 
         foreach (Transform child in closestTile.transform)
