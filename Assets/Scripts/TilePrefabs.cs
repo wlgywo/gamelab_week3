@@ -9,7 +9,6 @@ public class TilePrefabs : MonoBehaviour
     public bool isWatered = false;
     public Material wateredMaterial;
     public Material defaultMaterial;
-    public bool isRaining = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

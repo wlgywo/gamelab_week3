@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public enum FarmingState
@@ -5,13 +6,14 @@ public enum FarmingState
     Dirt, 
     Water,
     Harvest,
-    Seed
+    Plant
 }
 public class ModeManager : MonoBehaviour
 {
     public static ModeManager Instance { get; private set; }
     private int currentMode = 0;
     public FarmingState currentWork = FarmingState.Dirt;
+    public event Action<int> ChangeModeText;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
     {
@@ -60,13 +62,13 @@ public class ModeManager : MonoBehaviour
                 currentWork = FarmingState.Harvest;
                 break;
             case 4:
-                currentWork = FarmingState.Seed;
+                currentWork = FarmingState.Plant;
                 break;
             default:
                 currentWork = FarmingState.Dirt;
                 break;
         }
 
-        Debug.Log("Current Mode: " + currentWork);
+        ChangeModeText?.Invoke(currentMode);
     }
 }

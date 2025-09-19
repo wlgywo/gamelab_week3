@@ -3,7 +3,7 @@ using UnityEngine;
 public class SpawnDirt : MonoBehaviour
 {
 
-    public GameObject dirtPrefabs;
+    /*public GameObject dirtPrefabs;
     public GameObject seedPrefabs;
     public float dirtSpawnHeight = 0.5f;
     public float seedSpawnHeight = 1.0f;
@@ -18,11 +18,6 @@ public class SpawnDirt : MonoBehaviour
 
     void OnDisable()
     {
-        /*
-        if (InputManager.Instance != null)
-        {
-            InputManager.Instance.TileClick -= SpawningDirt;
-        }*/
         if (InputManager.Instance != null)
         {
             InputManager.Instance.DoPlant -= DoAnything;
@@ -99,5 +94,5 @@ public class SpawnDirt : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, interactionRange);
-    }
+    }*/
 }
