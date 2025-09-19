@@ -57,14 +57,14 @@ public class InputManager : MonoBehaviour
         playerInput.Player.PrimaryClick.started += StartDrag;
         playerInput.Player.PrimaryClick.canceled += EndDrag;
         playerInput.Player.PrimaryClick.performed += OnLeftClick;
-        playerInput.Player.HorizontalLeft.performed += OnPressA;
-        playerInput.Player.HorizontalRight.performed += OnPressD;
-        playerInput.Player.HorizontalLeft.canceled += OffPressA;
-        playerInput.Player.HorizontalRight.canceled += OffPressD;
+        //playerInput.Player.HorizontalLeft.performed += OnPressA;
+        //playerInput.Player.HorizontalRight.performed += OnPressD;
+        //playerInput.Player.HorizontalLeft.canceled += OffPressA;
+        //playerInput.Player.HorizontalRight.canceled += OffPressD;
         playerInput.Player.MovementHoriAxis.performed += OnHoriAxis;
         playerInput.Player.MovementHoriAxis.canceled += OnHoriAxis;
         playerInput.Player.Interaction.performed += OnInteract;
-        // playerInput.Player.ModeSwitch.performed += SwitchMode;
+        playerInput.Player.ModeSwitch.performed += SwitchMode;
 
     }
 
@@ -76,15 +76,15 @@ public class InputManager : MonoBehaviour
         playerInput.Player.Pause.performed -= OnPause; 
         playerInput.Player.PrimaryClick.started -= StartDrag;
         playerInput.Player.PrimaryClick.canceled -= EndDrag;
-        playerInput.Player.PrimaryClick.performed -= OnLeftClick;
-        playerInput.Player.HorizontalLeft.performed -= OnPressA;
-        playerInput.Player.HorizontalRight.performed -= OnPressD;
-        playerInput.Player.HorizontalLeft.canceled -= OffPressA;
-        playerInput.Player.HorizontalRight.canceled -= OffPressD;
+        //playerInput.Player.PrimaryClick.performed -= OnLeftClick;
+        //playerInput.Player.HorizontalLeft.performed -= OnPressA;
+        //playerInput.Player.HorizontalRight.performed -= OnPressD;
+        //playerInput.Player.HorizontalLeft.canceled -= OffPressA;
+        //playerInput.Player.HorizontalRight.canceled -= OffPressD;
         playerInput.Player.MovementHoriAxis.performed -= OnHoriAxis;
         playerInput.Player.MovementHoriAxis.canceled -= OnHoriAxis;
         playerInput.Player.Interaction.performed -= OnInteract;
-        // playerInput.Player.ModeSwitch.performed -= SwitchMode;
+        playerInput.Player.ModeSwitch.performed -= SwitchMode;
 
         playerInput.Player.Disable();
     }
@@ -94,10 +94,10 @@ public class InputManager : MonoBehaviour
         playerInput.Player.PrimaryClick.started -= StartDrag;
         playerInput.Player.PrimaryClick.canceled -= EndDrag;
         playerInput.Player.PrimaryClick.performed -= OnLeftClick;
-        playerInput.Player.HorizontalLeft.performed -= OnPressA;
-        playerInput.Player.HorizontalRight.performed -= OnPressD;
-        playerInput.Player.HorizontalLeft.canceled -= OffPressA;
-        playerInput.Player.HorizontalRight.canceled -= OffPressD;
+        //playerInput.Player.HorizontalLeft.performed -= OnPressA;
+        //playerInput.Player.HorizontalRight.performed -= OnPressD;
+        //playerInput.Player.HorizontalLeft.canceled -= OffPressA;
+        //playerInput.Player.HorizontalRight.canceled -= OffPressD;
         playerInput.Player.MovementHoriAxis.performed -= OnHoriAxis;
         playerInput.Player.MovementHoriAxis.canceled -= OnHoriAxis;
         playerInput.Player.Jump.started -= SpaceStarted;
@@ -136,10 +136,10 @@ public class InputManager : MonoBehaviour
         playerInput.Player.PrimaryClick.started += StartDrag;
         playerInput.Player.PrimaryClick.canceled += EndDrag;
         playerInput.Player.PrimaryClick.performed += OnLeftClick;
-        playerInput.Player.HorizontalLeft.performed += OnPressA;
-        playerInput.Player.HorizontalRight.performed += OnPressD;
-        playerInput.Player.HorizontalLeft.canceled += OffPressA;
-        playerInput.Player.HorizontalRight.canceled += OffPressD;
+        //playerInput.Player.HorizontalLeft.performed += OnPressA;
+        //playerInput.Player.HorizontalRight.performed += OnPressD;
+        //playerInput.Player.HorizontalLeft.canceled += OffPressA;
+        //playerInput.Player.HorizontalRight.canceled += OffPressD;
         playerInput.Player.MovementHoriAxis.performed += OnHoriAxis;
         playerInput.Player.MovementHoriAxis.canceled += OnHoriAxis;
     }
@@ -278,8 +278,9 @@ public class InputManager : MonoBehaviour
         SpaceReleased?.Invoke();
     }
 
-   private void OnPressA(InputAction.CallbackContext context)
+   /*private void OnPressA(InputAction.CallbackContext context)
    {
+        Debug.Log("A Pressed");
         if (context.performed)
         {
             PressA?.Invoke();
@@ -288,6 +289,7 @@ public class InputManager : MonoBehaviour
 
     private void OnPressD(InputAction.CallbackContext context)
     {
+        Debug.Log("D Pressed");
         if (context.performed)
         {
             PressD?.Invoke();
@@ -296,16 +298,18 @@ public class InputManager : MonoBehaviour
 
     private void OffPressA(InputAction.CallbackContext context)
     {
+        Debug.Log("A Released");
         ReleaseA?.Invoke();
     }
 
     private void OffPressD(InputAction.CallbackContext context)
     {
+        Debug.Log("D Released");
         ReleaseD?.Invoke();
-    }
+    }*/
 
     private void OnHoriAxis(InputAction.CallbackContext context)
-    {
+     {
         float movement = context.ReadValue<float>();
         MovementAD?.Invoke(movement);
     }
@@ -319,8 +323,19 @@ public class InputManager : MonoBehaviour
 
     private void SwitchMode(InputAction.CallbackContext context)
     {
-        int modeType = (int)context.ReadValue<float>();
-        ChangeModeType?.Invoke(modeType);
-        Debug.Log("Mode Switch to " + modeType);
+        string keyName = context.control.name;
+        if (int.TryParse(keyName, out int numberValue))
+        {
+            ChangeModeType?.Invoke(numberValue);
+        }
+        else
+        {
+            Debug.LogWarning($"Could not parse key name '{keyName}' to an integer.");
+        }
     }
+
+    //public void ClearAllInputs()
+    //{
+    //    MovementAD?.Invoke(0f);
+    //}
 }

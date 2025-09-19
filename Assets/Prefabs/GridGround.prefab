@@ -99,7 +99,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: aa1bf9394c32f5449a076d0b86a62539, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -149,3 +149,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isDirtSpawned: 0
   isSeedSpawned: 0
+  isWatered: 0
+  wateredMaterial: {fileID: 2100000, guid: eda4dc1af812ec340a437f5b63a8acb5, type: 2}
+  defaultMaterial: {fileID: 2100000, guid: 3b4c53e9be6736c4e8f1b7be612cb8d1, type: 2}

@@ -42,22 +42,21 @@ public class SpawnDirt : MonoBehaviour
         if (tileInfo == null) return;
 
         Vector3 spawnPosition = targetTile.transform.position;
-        if (!targetTile.GetComponent<TilePrefabs>().isSeedSpawned && targetTile.GetComponent<TilePrefabs>().isDirtSpawned)
+        if (!targetTile.GetComponent<TilePrefabs>().isSeedSpawned && targetTile.GetComponent<TilePrefabs>().isDirtSpawned && ModeManager.Instance.currentWork == FarmingState.Seed)
         {
-            Instantiate(seedPrefabs, spawnPosition + Vector3.up * seedSpawnHeight, Quaternion.identity);
+            Instantiate(seedPrefabs, spawnPosition + Vector3.up * seedSpawnHeight, Quaternion.identity, targetTile.transform);
             targetTile.GetComponent<TilePrefabs>().isSeedSpawned = true;
         }
 
-        if (!targetTile.GetComponent<TilePrefabs>().isDirtSpawned)
+        if (!targetTile.GetComponent<TilePrefabs>().isDirtSpawned && ModeManager.Instance.currentWork == FarmingState.Dirt)
         {
-            Instantiate(dirtPrefabs, spawnPosition + Vector3.up * dirtSpawnHeight, Quaternion.identity);
+            Instantiate(dirtPrefabs, spawnPosition + Vector3.up * dirtSpawnHeight, Quaternion.identity, targetTile.transform);
             targetTile.GetComponent<TilePrefabs>().isDirtSpawned = true;
         }
         
     }
     public void SpawningDirt(RaycastHit2D hitInfo)
     {
-        // hitInfo에서 GameObject를 추출한 뒤, 핵심 로직 함수를 호출합니다.
         GameObject currentTile = hitInfo.collider.gameObject;
         PlantOnTile(currentTile);
     }
@@ -93,6 +92,7 @@ public class SpawnDirt : MonoBehaviour
                 PlantOnTile(closestTile.gameObject);
             }
         }
+        // InputManager.Instance.ClearAllInputs();
     }
 
     private void OnDrawGizmos()

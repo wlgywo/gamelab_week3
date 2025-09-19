@@ -24,7 +24,7 @@ public class SpawnSqueeze : MonoBehaviour
         
     }
 
-    IEnumerator StartSqueeze(float xSqueeze, float ySqueeze, float seconds, float dropAmount, bool jumpSqueeze)
+    public IEnumerator StartSqueeze(float xSqueeze, float ySqueeze, float seconds, float dropAmount, bool jumpSqueeze)
     {
 
         Vector3 originalSize = prefabSprite.transform.localScale;
@@ -50,5 +50,10 @@ public class SpawnSqueeze : MonoBehaviour
             prefabSprite.transform.localPosition = Vector3.Lerp(newPosition, originalPosition, t);
             yield return null;
         }
+    }
+
+    public void CallSqueeze()
+    {
+        StartCoroutine(StartSqueeze(landSquashSettings.x * landSqueezeMultiplier, landSquashSettings.y / landSqueezeMultiplier, landSquashSettings.z, landDrop, false));
     }
 }

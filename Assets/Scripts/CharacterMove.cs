@@ -162,9 +162,7 @@ public class CharacterMove : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Target") && !isCleared)
-        {
-        }
+        
     }
 
     private void ApplyBounce(GameObject gameObject, Collision2D collision)

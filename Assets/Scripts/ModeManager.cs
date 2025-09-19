@@ -3,8 +3,9 @@ using UnityEngine.InputSystem;
 public enum FarmingState
 {
     Dirt, 
-    Seed,
-    Water
+    Water,
+    Harvest,
+    Seed
 }
 public class ModeManager : MonoBehaviour
 {
@@ -49,18 +50,23 @@ public class ModeManager : MonoBehaviour
 
         switch (currentMode)
         {
-            case 0:
-                currentWork = FarmingState.Dirt;
-                break;
             case 1:
-                currentWork = FarmingState.Seed;
+                currentWork = FarmingState.Dirt;
                 break;
             case 2:
                 currentWork = FarmingState.Water;
+                break;
+            case 3:
+                currentWork = FarmingState.Harvest;
+                break;
+            case 4:
+                currentWork = FarmingState.Seed;
                 break;
             default:
                 currentWork = FarmingState.Dirt;
                 break;
         }
+
+        Debug.Log("Current Mode: " + currentWork);
     }
 }

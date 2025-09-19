@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Tile
   - Ground
+  - Crop
   layers:
   - Default
   - TransparentFX
@@ -15,7 +16,7 @@ TagManager:
   - UI
   - Ground
   - 
-  - Ground1
+  - CanHarvest
   - 
   - 
   - 
