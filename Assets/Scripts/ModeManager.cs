@@ -6,7 +6,13 @@ public enum FarmingState
     Dirt, 
     Water,
     Harvest,
-    Plant
+    PlantParsnip,
+    PlantCarrot,
+    PlantRadish,
+    PlantPotato,
+    PlantEggplant,
+    PlantPumpkin,
+    Fertilize
 }
 public class ModeManager : MonoBehaviour
 {
@@ -62,7 +68,25 @@ public class ModeManager : MonoBehaviour
                 currentWork = FarmingState.Harvest;
                 break;
             case 4:
-                currentWork = FarmingState.Plant;
+                currentWork = FarmingState.Fertilize;
+                break;
+            case 5:
+                currentWork = FarmingState.PlantParsnip;
+                break;
+            case 6:
+                currentWork = FarmingState. PlantCarrot;
+                break;
+            case 7:
+                currentWork = FarmingState.PlantRadish;
+                break;
+            case 8:
+                currentWork = FarmingState.PlantPotato;
+                break;
+            case 9:
+                currentWork = FarmingState.PlantEggplant;
+                break;
+            case 0:
+                currentWork = FarmingState.PlantPumpkin;
                 break;
             default:
                 currentWork = FarmingState.Dirt;

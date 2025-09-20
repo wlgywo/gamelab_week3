@@ -7,11 +7,15 @@ public class TilePrefabs : MonoBehaviour
     public bool isDirtSpawned = false;
     public bool isSeedSpawned = false;
     public bool isWatered = false;
-    public Material wateredMaterial;
-    public Material defaultMaterial;
-
     public bool isOccupiedByGiantCrop = false; // 거대 작물 여부
     public bool isWateredToday = false;
+    public bool isFertilized = false; // 비료 여부
+
+    public Material wateredMaterial;
+    public Material defaultMaterial;
+    public Material fertilizedMaterial_Dry;
+    public Material fertilizedMaterial_Wet;
+    
     public CropBehaviour GetContainedCrop()
     {
         if (isSeedSpawned)
@@ -57,23 +61,38 @@ public class TilePrefabs : MonoBehaviour
 
     public void GetWet()
     {
-        GetComponent<SpriteRenderer>().material = wateredMaterial;
+        if(isFertilized)
+        {
+            GetComponent<SpriteRenderer>().material = fertilizedMaterial_Wet;
+        }
+        else
+            GetComponent<SpriteRenderer>().material = wateredMaterial;
         isWatered = true;
         isWateredToday = true;
     }
 
     public void GetWetByPlayer()
     {
+        if(isFertilized)
+        {
+            GetComponent<SpriteRenderer>().material = fertilizedMaterial_Wet;
+        }
+        else
         if (!isWatered)
         {
             GetComponent<SpriteRenderer>().material = wateredMaterial;
-            isWatered = true;
-            isWateredToday = true;
         }
+        isWatered = true;
+        isWateredToday = true;
     }
     private void Dry()
     {
-        GetComponent<SpriteRenderer>().material = defaultMaterial;
+        if(isFertilized)
+        {
+            GetComponent<SpriteRenderer>().material = fertilizedMaterial_Dry;
+        }
+        else
+            GetComponent<SpriteRenderer>().material = defaultMaterial;
         isWatered = false;
         isWateredToday = false;
     }
@@ -82,5 +101,23 @@ public class TilePrefabs : MonoBehaviour
         if (isWatered && gameObject.GetComponentInChildren<CropBehaviour>()!=null)
             gameObject.GetComponentInChildren<CropBehaviour>().Grow(newDay);
         Dry();
+    }
+
+    public void GetFertilized()
+    {
+        if(WeatherManager.Instance.isRaining||isWatered)
+            GetComponent<SpriteRenderer>().material = fertilizedMaterial_Wet;
+        else
+            GetComponent<SpriteRenderer>().material = fertilizedMaterial_Dry;
+        isFertilized = true;
+    }
+
+    public void RemoveFertilizer()
+    {
+        isFertilized = false;
+        if (isWatered)
+            GetComponent<SpriteRenderer>().material = wateredMaterial;
+        else
+            GetComponent<SpriteRenderer>().material = defaultMaterial;
     }
 }

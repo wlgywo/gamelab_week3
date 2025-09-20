@@ -272,8 +272,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7369922644334118195}
   - component: {fileID: 1050173816669702455}
-  - component: {fileID: -5931498597253264403}
-  - component: {fileID: 8467650738339229351}
   m_Layer: 0
   m_Name: Seed
   m_TagString: Untagged
@@ -353,37 +351,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-5931498597253264403
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9079460962411034415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14e5d382a5ed25348827bfd85984f1ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  jumpSquashSettings: {x: 0.3, y: 0.1, z: 0.1}
-  landSquashSettings: {x: 0.3, y: 0.1, z: 0.1}
-  landSqueezeMultiplier: 1.1
-  jumpSqueezeMultiplier: 1.1
-  landDrop: 0.05
---- !u!114 &8467650738339229351
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9079460962411034415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aedbb17fde6481c4a8469ff355ad95dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cropData: {fileID: 11400000, guid: 197137bd662b1314789fe29315aabf9b, type: 2}
-  growthStageObjects:
-  - {fileID: 9079460962411034415}
-  - {fileID: 0}
-  - {fileID: 0}

@@ -9,6 +9,7 @@ public class WeatherManager : MonoBehaviour
     public float probability = 0.3f;
     public ParticleSystem rainEffect;
     public string spawnPointTag = "Tile";
+    public bool isRaining = false;
 
     public event Action OnRainStarted;
     public event Action OnRainStopped;
@@ -43,11 +44,13 @@ public class WeatherManager : MonoBehaviour
         if (randomValue < probability)
         {
             rainEffect.Play();
+            isRaining = true;
             OnRainStarted?.Invoke();
         }
         else
         {
             rainEffect.Stop();
+            isRaining = false;
             OnRainStopped?.Invoke();
         }
     }

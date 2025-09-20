@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,7 +14,14 @@ public class UIManager : MonoBehaviour
     public TMP_Text timeText;
     public TMP_Text harvetText;
     public TMP_Text moneyText;
-    public TMP_Text inventoryText;
+    public TMP_Text waterText;
+    public TMP_Text inventoryText_Fertilizer;
+    public TMP_Text inventoryText_Parsnip;
+    public TMP_Text inventoryText_Carrot;
+    public TMP_Text inventoryText_Radish;
+    public TMP_Text inventoryText_Potato;  
+    public TMP_Text inventoryText_Eggplant;
+    public TMP_Text inventoryText_Pumpkin;
 
 
     public GameObject storeNoticeText;
@@ -42,6 +50,7 @@ public class UIManager : MonoBehaviour
         ModeManager.Instance.ChangeModeText += UpdateModeText;
         UpdateTimeDisplay(TimeManager.Instance.CurrentHour);
         UpdateInventoryText();
+        UpdateWaterText(100f);
     }
 
     void OnDisable()
@@ -67,9 +76,13 @@ public class UIManager : MonoBehaviour
 
     public void UpdateModeText(int mode)
     {
+        int selectedIndex = (mode == 0) ? 9 : mode - 1;
+
+        // 2. ¸ðµç ÅØ½ºÆ®¸¦ ¼øÈ¸ÇÏ¸ç »ö»óÀ» ¼³Á¤ÇÕ´Ï´Ù.
         for (int i = 0; i < modeTexts.Count; i++)
         {
-            if (i == mode-1)
+            // 3. ÇöÀç ÀÎµ¦½º°¡ À§¿¡¼­ °áÁ¤µÈ selectedIndex¿Í °°ÀºÁö È®ÀÎÇÕ´Ï´Ù.
+            if (i == selectedIndex)
             {
                 modeTexts[i].color = selectedColor;
             }
@@ -117,13 +130,36 @@ public class UIManager : MonoBehaviour
 
     public void UpdateHarvestText()
     {
-        harvetText.text = $"ÆÄ½º´Õ: {CropManager.Instance.harvestAmountParsnip} °³\n" +
-                        $"¹«: 0 °³\n";
+        /*
+        harvetText.text = $"ÆÄ½º´Õ: {CropManager.Instance.inventory[]} °³\n" +
+                        $"´ç±Ù: {CropManager.Instance.harvestAmountCarrot} °³\n";
         // ¿©±â´Ù°¡ ´Ù¸¥ ÀÛ¹° Ãß°¡
+        */
+
+
+        StringBuilder sb = new StringBuilder();
+
+        foreach (KeyValuePair<string, int> item in CropManager.Instance.inventory)
+        {
+            sb.AppendLine($"{item.Key}: {item.Value} °³");
+        }
+
+        harvetText.text = sb.ToString();
     }
 
     public void UpdateInventoryText()
     {
-        inventoryText.text = $"4. ÆÄ½º´Õ ¾¾¾Ñ X {CropManager.Instance.seedParsnip}";
+        inventoryText_Fertilizer.text = $"4. ºñ·á X {GameManager.Instance.fertilizerCount}";
+        inventoryText_Parsnip.text = $"5. ÆÄ½º´Õ ¾¾¾Ñ X {CropManager.Instance.seedParsnip}";  
+        inventoryText_Carrot.text = $"6. ´ç±Ù ¾¾¾Ñ X {CropManager.Instance.seedCarrot}";
+        inventoryText_Radish.text = $"7. ¹« ¾¾¾Ñ X {CropManager.Instance.seedRadish}";
+        inventoryText_Potato.text = $"8. °¨ÀÚ ¾¾¾Ñ X {CropManager.Instance.seedPotato}";
+        inventoryText_Eggplant.text = $"9. °¡Áö ¾¾¾Ñ X {CropManager.Instance.seedEggplant}";
+        inventoryText_Pumpkin.text = $"10. È£¹Ú ¾¾¾Ñ X {CropManager.Instance.seedPumpkin}";
+    }
+
+    public void UpdateWaterText(float waterAmount)
+    {
+        waterText.text = $"2. ¹°»Ñ¸®°³ (ÇöÀç ¹° ¾ç: {waterAmount})";
     }
 }

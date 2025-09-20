@@ -10,8 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2bc4a30d2832d274eb8b004c3c8ce7f4, type: 3}
-  m_Name: ParsnipSeed
+  m_Name: GiantCarrot
   m_EditorClassIdentifier: 
-  cropName: Parsnip
+  cropName: GiantCarrot
   cropDescription: prasnip is good
-  growthDays: 3
+  harvestedItemID: "\uB2F9\uADFC"
+  growthDays: 0
+  minYield: 1
+  maxYield: 1
+  minFertilizedYield: 2
+  maxFertilizedYield: 4
+  isGiantCrop: 1
+  giantCropYield: 10
+  sellPrice: 0
+  giantVersionPrefab: {fileID: 0}

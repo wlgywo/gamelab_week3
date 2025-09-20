@@ -4,6 +4,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public int playerMoney = 0; 
+    public int fertilizerCount = 0;
 
     private void Awake()
     {

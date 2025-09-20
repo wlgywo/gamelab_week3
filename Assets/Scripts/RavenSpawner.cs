@@ -34,7 +34,7 @@ public class RavenSpanwer : MonoBehaviour
         {
             CropBehaviour crop = point.GetComponent<CropBehaviour>();
 
-            if (crop != null && !crop.isEaten && IsPositionSafeToSpawn(point.transform.position))
+            if (crop != null && !crop.isEaten && IsPositionSafeToSpawn(point.transform.position) && !crop.GetComponentInParent<TilePrefabs>().isOccupiedByGiantCrop)
             {
                 validSpawnPoints.Add(point);
             }

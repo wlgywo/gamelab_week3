@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc4a30d2832d274eb8b004c3c8ce7f4, type: 3}
+  m_Name: PotatoSeed
+  m_EditorClassIdentifier: 
+  cropName: Potato
+  cropDescription: 
+  harvestedItemID: "\uAC10\uC790"
+  growthDays: 4
+  minYield: 1
+  maxYield: 1
+  minFertilizedYield: 2
+  maxFertilizedYield: 4
+  isGiantCrop: 0
+  giantCropYield: 10
+  sellPrice: 350
+  giantVersionPrefab: {fileID: 8932975428292407836, guid: bfd260dae0fee6444bf4a30e82ff1321, type: 3}

@@ -14,4 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cropName: GiantParsnip
   cropDescription: prasnip is good
-  growthDays: 1
+  harvestedItemID: "\uD30C\uC2A4\uB2D9"
+  growthDays: 0
+  minYield: 1
+  maxYield: 1
+  minFertilizedYield: 2
+  maxFertilizedYield: 4
+  isGiantCrop: 1
+  giantCropYield: 10
+  sellPrice: 0
+  giantVersionPrefab: {fileID: 0}
