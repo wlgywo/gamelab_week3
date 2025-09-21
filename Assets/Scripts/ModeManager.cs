@@ -12,7 +12,8 @@ public enum FarmingState
     PlantPotato,
     PlantEggplant,
     PlantPumpkin,
-    Fertilize
+    Fertilize, 
+    Scarecrow
 }
 public class ModeManager : MonoBehaviour
 {
@@ -87,6 +88,9 @@ public class ModeManager : MonoBehaviour
                 break;
             case 0:
                 currentWork = FarmingState.PlantPumpkin;
+                break;
+            case 11:
+                currentWork = FarmingState.Scarecrow;
                 break;
             default:
                 currentWork = FarmingState.Dirt;

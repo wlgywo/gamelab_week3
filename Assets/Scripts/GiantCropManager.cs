@@ -34,6 +34,11 @@ public class GiantCropManager : MonoBehaviour
         }
     }
 
+    public List<TilePrefabs> GetAllTiles()
+    {
+        return new List<TilePrefabs>(allTiles); // 원본 리스트를 보호하기 위해 사본을 반환
+    }
+
     private void Awake()
     {
         if (Instance == null)

@@ -28,4 +28,5 @@ public class ScarecrowScript : MonoBehaviour
         Vector3 boxSize = new Vector3(squareHalfSize * 2, squareHalfSize * 2, 0);
         Gizmos.DrawWireCube(transform.position, boxSize);
     }
+
 }

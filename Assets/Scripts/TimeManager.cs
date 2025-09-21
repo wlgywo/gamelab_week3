@@ -7,7 +7,7 @@ public class TimeManager : MonoBehaviour
 {
     public static TimeManager Instance { get; private set; }
     public const int HOURS_PER_DAY = 3;
-    public const float SECONDS_PER_HOUR = 3f; // 1시간
+    public const float SECONDS_PER_HOUR = 10f; // 1시간
 
     //매 시간 변경될 때 호출되는 이벤 (인자: 새로운 시간)
     public event Action<int> OnHourChanged;
@@ -81,6 +81,7 @@ public class TimeManager : MonoBehaviour
     {
         if(_isTransitioningDay) yield break;
         _isTransitioningDay = true;
+
         InputManager.Instance.playerInput.Player.Disable();
         InputManager.Instance.playerInput.UI.Enable();
 
@@ -88,24 +89,25 @@ public class TimeManager : MonoBehaviour
 
         // 시간이 멈추고 정산 UI 표시
         Time.timeScale = 0f;
-        UIManager.Instance.UpdateTodayEarningText();
         UIManager.Instance.mainCanvas.SetActive(false);
+        UIManager.Instance.oneRoomUI.SetActive(false);
+        UIManager.Instance.sellUI.SetActive(false);
+        UIManager.Instance.storeUI.SetActive(false);
+        yield return StartCoroutine(FairyManager.Instance.CheckAndRunFairyEvent(CurrentDay));
+
+        UIManager.Instance.UpdateTodayEarningText();
         UIManager.Instance.continueText.gameObject.SetActive(true);
         UIManager.Instance.todayEarningText.gameObject.SetActive(true);
         InputManager.Instance.isPlayerInputLocked = true; // 입력 잠금
         
-
         // 하루 끝 이벤트 호출
         CurrentHour = 0;
         CurrentDay++;
-        GiantCropManager.Instance.CheckForGiantCrops();
-        OnDayEnd?.Invoke(CurrentDay); // ★ 원하는 타이밍에 호출
+        
+        OnDayEnd?.Invoke(CurrentDay);
 
         // 플레이어의 다음 날 진행 입력을 대기
         TimeManager.Instance.canProceedToNextDay = false;
-        UIManager.Instance.oneRoomUI.SetActive(false);
-        UIManager.Instance.sellUI.SetActive(false);
-        UIManager.Instance.storeUI.SetActive(false);
         yield return new WaitUntil(() => TimeManager.Instance.canProceedToNextDay);
 
         // 정산 UI 숨김
@@ -118,6 +120,7 @@ public class TimeManager : MonoBehaviour
         yield return StartCoroutine(UIManager.Instance.FadeIn());
 
         // 하루 시작 이벤트 호출 및 시간 흐름 재개
+        GiantCropManager.Instance.CheckForGiantCrops();
         OnDayStart?.Invoke(CurrentDay); // ★ 원하는 타이밍에 호출
         Time.timeScale = 1f;
         InputManager.Instance.playerInput.Player.Enable();

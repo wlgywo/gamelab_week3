@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
     public int playerMoney = 0; 
     public int allEarnings = 0;
     public int fertilizerCount = 0;
+    public int scarecrowCount = 0;
 
     private void Awake()
     {

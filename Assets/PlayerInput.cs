@@ -849,6 +849,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""ModeSwitch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7332c002-f3a5-4b17-a02c-d081c8983e7f"",
+                    ""path"": ""<Keyboard>/f1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""ModeSwitch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },

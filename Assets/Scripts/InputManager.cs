@@ -171,10 +171,11 @@ public class InputManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /*
         if (playerInput.Player.PrimaryClick.IsPressed())
             isDragging = true;
         else
-            isDragging = false;
+            isDragging = false;*/
         // GetCurrentMousePosition();
         // GetMoveInput();
     }
@@ -335,7 +336,20 @@ public class InputManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"Could not parse key name '{keyName}' to an integer.");
+            switch (keyName)
+            {
+                case "f1":
+                    numberValue = 11;
+                    ChangeModeType?.Invoke(numberValue);
+                    break;
+                case "f2":
+                    numberValue = 12;
+                    ChangeModeType?.Invoke(numberValue);
+                    break;
+                default:
+                    Debug.LogWarning($"처리할 수 없는 키 입력입니다: '{context.control.name}'");
+                    break;
+            }
         }
     }
 

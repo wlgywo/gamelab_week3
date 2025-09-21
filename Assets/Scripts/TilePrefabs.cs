@@ -8,6 +8,7 @@ public class TilePrefabs : MonoBehaviour
     public bool isSeedSpawned = false;
     public bool isWatered = false;
     public bool isOccupiedByGiantCrop = false; // 거대 작물 여부
+    public bool isOccupiedByScarecrow = false; // 허수아비 여부
     public bool isWateredToday = false;
     public bool isFertilized = false; // 비료 여부
 
@@ -28,7 +29,9 @@ public class TilePrefabs : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        // FairyManager.Instance.OnFairyEventStarted += DayChangeHappend;
         TimeManager.Instance.OnDayEnd += DayChangeHappend;
+        TimeManager.Instance.OnDayStart += DryForDayStart;
         WeatherManager.Instance.OnRainStarted += GetWet;
         WeatherManager.Instance.OnRainStopped += Dry;
         // GiantCropManager가 존재할 때만 자신을 등록합니다.
@@ -42,7 +45,9 @@ public class TilePrefabs : MonoBehaviour
     {
         if (TimeManager.Instance != null)
         {
+            // FairyManager.Instance.OnFairyEventStarted -= DayChangeHappend;
             TimeManager.Instance.OnDayEnd -= DayChangeHappend;
+            TimeManager.Instance.OnDayStart -= DryForDayStart;
             WeatherManager.Instance.OnRainStarted -= GetWet;
             WeatherManager.Instance.OnRainStopped -= Dry;
         }
@@ -85,6 +90,11 @@ public class TilePrefabs : MonoBehaviour
         isWatered = true;
         isWateredToday = true;
     }
+
+    private void DryForDayStart(int newday)
+    {
+        Dry();
+    }
     private void Dry()
     {
         if(isFertilized)
@@ -100,7 +110,6 @@ public class TilePrefabs : MonoBehaviour
     {
         if (isWatered && gameObject.GetComponentInChildren<CropBehaviour>()!=null)
             gameObject.GetComponentInChildren<CropBehaviour>().Grow(newDay);
-        Dry();
     }
 
     public void GetFertilized()

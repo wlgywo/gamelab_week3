@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -18,8 +19,10 @@ public class UIManager : MonoBehaviour
     public TMP_Text moneyText;
     public TMP_Text waterText;
     public TMP_Text weatherProbabilityText;
+    public TMP_Text scarecrowText;
 
     public GameObject mainCanvas;
+    private Coroutine _updateTextCoroutine;
 
     [Header("인벤토리 텍스트")]
     public TMP_Text inventoryText_Fertilizer;
@@ -29,7 +32,8 @@ public class UIManager : MonoBehaviour
     public TMP_Text inventoryText_Potato;  
     public TMP_Text inventoryText_Eggplant;
     public TMP_Text inventoryText_Pumpkin;
-    
+    public TMP_Text inventoryText_Scarecrow;
+
 
     public GameObject storeNoticeText;
     public GameObject sellNoticeText;
@@ -50,6 +54,11 @@ public class UIManager : MonoBehaviour
     [Header("텍스트 색상")]
     public Color defaultColor = Color.white;
     public Color selectedColor = Color.yellow;
+
+    [Header("허수아비 메시지")]
+    public GameObject askHarvestUI;
+    private Action onYesAction;
+    private Action onNoAction;
     private void Awake()
     {
         if (Instance == null)
@@ -141,32 +150,38 @@ public class UIManager : MonoBehaviour
     
     public void ShowSellNoticeText()
     {
+        if(sellNoticeText == null) return;
         sellNoticeText.SetActive(true);
     }
 
     public void HideSellNoticeText()
     {
+        if (sellNoticeText == null) return;
         sellNoticeText.SetActive(false);
     }
 
     public void ShowStoreNoticeText()
     {
+        if(storeNoticeText == null) return;
         storeNoticeText.GetComponent<TextMeshProUGUI>().text = $"- 상점 -\n >> 들어가기 [E] <<";
         storeNoticeText.SetActive(true);
     }
 
     public void HideStoreNoticeText()
     {
+        if (storeNoticeText == null) return;
         storeNoticeText.SetActive(false);
     }
 
     public void ShowOneRoomNoticeText()
     {
+        if (oneRoomNoticeText == null) return;
         oneRoomNoticeText.SetActive(true);
     }
 
     public void HideOneRoomNoticeText()
     {
+        if (oneRoomNoticeText == null) return;
         oneRoomNoticeText.SetActive(false);
     }
 
@@ -203,6 +218,7 @@ public class UIManager : MonoBehaviour
         inventoryText_Potato.text = $"8. 감자 씨앗 X {CropManager.Instance.seedPotato}";
         inventoryText_Eggplant.text = $"9. 가지 씨앗 X {CropManager.Instance.seedEggplant}";
         inventoryText_Pumpkin.text = $"10. 호박 씨앗 X {CropManager.Instance.seedPumpkin}";
+        inventoryText_Scarecrow.text = $"F1. 허수아비 X {GameManager.Instance.scarecrowCount}";
     }
 
     public void UpdateWaterText(float waterAmount)
@@ -218,87 +234,28 @@ public class UIManager : MonoBehaviour
 
     public void UpdateTodayEarningText()
     {
-        todayEarningText.text = $"{TimeManager.Instance.CurrentDay-1} 일차\n오늘의 수익\n{earning} 원\n총 수익\n{GameManager.Instance.allEarnings} 원";
+        todayEarningText.text = $"{TimeManager.Instance.CurrentDay} 일차\n오늘의 수익\n{earning} 원\n총 수익\n{GameManager.Instance.allEarnings} 원";
     }
 
-    /*
-    public void StartFadeIn(int newday)
+    public void ShowScarecrowMessage(string text)
     {
-        StartCoroutine(FadeIn());
-    }
-
-    public void StartFadeOut(int newday)
-    {
-        StartCoroutine(FadeOut());
-    }
-
-    IEnumerator FadeIn()
-    {
-        float t = 0;
-        Color color = fadeImage.color;
-        while (t < fadeDuration)
+        // 2. 이전에 실행된 코루틴이 아직 실행 중인지 확인
+        if (_updateTextCoroutine != null)
         {
-            t += Time.deltaTime;
-            color.a = t / fadeDuration;
-            fadeImage.color = color;
-            yield return null;
-        }
-    }
-
-    IEnumerator FadeOut()
-    {
-        float t = fadeDuration;
-        Color color = fadeImage.color;
-        while (t > 0f)
-        {
-            t -= Time.deltaTime;
-            color.a = t / fadeDuration;
-            fadeImage.color = color;
-            yield return null;
-        }
-    }
-    */
-    /*IEnumerator DayTransitionCoroutine()
-    {
-        InputManager.Instance.isPlayerInputLocked = true;
-        float t = 0;
-        Color color = fadeImage.color;
-        while (t < fadeDuration)
-        {
-            t += Time.unscaledDeltaTime;
-            color.a = Mathf.Clamp01(t / fadeDuration);
-            fadeImage.color = color;
-            yield return null;
+            // 3. 만약 실행 중이라면 즉시 중지
+            StopCoroutine(_updateTextCoroutine);
         }
 
-        UpdateTodayEarningText();
-        mainCanvas.SetActive(false);
-        Time.timeScale = 0f;
-        continueText.gameObject.SetActive(true);
-        todayEarningText.gameObject.SetActive(true);
+        // 4. 새로운 코루틴을 시작하고, 그 참조를 변수에 저장
+        _updateTextCoroutine = StartCoroutine(UpdateScarecrowText(text));
 
-        canProceedToNextDay = false;
-        yield return null;
-        yield return new WaitUntil(() => canProceedToNextDay);
-
-
-        mainCanvas.SetActive(true);
-        Time.timeScale = 1f;
-        continueText.gameObject.SetActive(false);
-        todayEarningText.gameObject.SetActive(false);
-
-
-        t = fadeDuration;
-        while (t > 0f)
-        {
-            t -= Time.unscaledDeltaTime;
-            color.a = Mathf.Clamp01(t / fadeDuration);
-            fadeImage.color = color;
-            yield return null;
-        }
-
-        InputManager.Instance.isPlayerInputLocked = false;
-    }*/
+    }
+    public IEnumerator UpdateScarecrowText(string text)
+    {
+        scarecrowText.text = text;
+        yield return new WaitForSeconds(2f);
+        scarecrowText.text = "";
+    }
 
     public IEnumerator FadeOut()
     {
@@ -324,5 +281,26 @@ public class UIManager : MonoBehaviour
             fadeImage.color = color;
             yield return null;
         }
+    }
+    public void ShowConfirmationPopup(Action onYes, Action onNo)
+    {
+        this.onYesAction = onYes;
+        this.onNoAction = onNo;
+        askHarvestUI.SetActive(true);
+        Time.timeScale = 0f;
+    }
+
+    public void OnYesClicked()
+    {
+        askHarvestUI.SetActive(false);
+        Time.timeScale = 1f;
+        onYesAction?.Invoke();
+    }
+
+    public void OnNoClicked()
+    {
+        askHarvestUI.SetActive(false);
+        Time.timeScale = 1f;
+        onNoAction?.Invoke();
     }
 }

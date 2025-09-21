@@ -1,5 +1,4 @@
 using System;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public class CropBehaviour : MonoBehaviour
@@ -9,7 +8,7 @@ public class CropBehaviour : MonoBehaviour
     public GameObject[] growthStageObjects;
 
     // private int currentGrowthStage = 0;
-    private int daysSincePlanted = 0;
+    public int daysSincePlanted = 0;
     public bool isEaten = false;
 
     private Vector3[] originalScales;

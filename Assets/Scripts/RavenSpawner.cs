@@ -33,7 +33,7 @@ public class RavenSpanwer : MonoBehaviour
         foreach (GameObject point in allSpawnPoints)
         {
             CropBehaviour crop = point.GetComponent<CropBehaviour>();
-
+            if(crop == null) continue;
             if (crop != null && !crop.isEaten && IsPositionSafeToSpawn(point.transform.position) && !crop.GetComponentInParent<TilePrefabs>().isOccupiedByGiantCrop)
             {
                 validSpawnPoints.Add(point);

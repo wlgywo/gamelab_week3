@@ -15,7 +15,7 @@ public class StoreScript : MonoBehaviour
     [SerializeField] private int eggplantSeedPrice = 40;
     [SerializeField] private int pumpkinSeedPrice = 40;
     [SerializeField] private int prayRainPrice = 100;
-
+    [SerializeField] private int scarecrowPrice = 200;
     void Start()
     {
         if (InputManager.Instance != null)
@@ -198,6 +198,22 @@ public class StoreScript : MonoBehaviour
         else
         {
             // "돈 부족" 팝업을 여기에 추가
+        }
+    }
+
+    public void BuyScarecrow()
+    {
+        int currentPlayerMoney = GameManager.Instance.playerMoney;
+        if (currentPlayerMoney >= scarecrowPrice)
+        {
+            GameManager.Instance.playerMoney -= scarecrowPrice;
+            GameManager.Instance.scarecrowCount++;
+            UIManager.Instance.UpdateMoneyText();
+            UIManager.Instance.UpdateInventoryText();
+        }
+        else
+        {
+
         }
     }
 }

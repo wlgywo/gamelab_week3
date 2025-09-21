@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 public class CharacterFarm : MonoBehaviour
 {
@@ -113,15 +113,17 @@ public class CharacterFarm : MonoBehaviour
     [Header("��ȣ�ۿ� ����")]
     public float interactionRange = 1.5f;
     public LayerMask plantableTileLayer;
+    public bool isHarvestingGiantCrop = false;
 
     [Header("������ �� ����Ʈ")]
-    public GameObject dirtPrefabs; // SpawnDirt���� ������ ����
+    public GameObject dirtPrefabs;
     public GameObject parsnipPrefabs;
-    public GameObject carrotPrefabs; // SpawnDirt���� ������ ����
+    public GameObject carrotPrefabs;
     public GameObject radishPrefabs;
     public GameObject potatoPrefabs;
     public GameObject eggplantPrefabs;
     public GameObject pumpkinPrefabs;
+    public GameObject scarecrowPrefabs;
     public float dirtSpawnHeight = 0.5f;
     public float seedSpawnHeight = 1.0f;
     public ParticleSystem waterEffect;
@@ -138,7 +140,7 @@ public class CharacterFarm : MonoBehaviour
     void Start()
     {
         InputManager.Instance.DoPlant += OnFarmingAction;
-        TimeManager.Instance.OnDayEnd += NextDayStart;
+        FairyManager.Instance.OnFairyEventStarted += NextDayStart;
         {
             if (waterFill != null)
             {
@@ -156,7 +158,7 @@ public class CharacterFarm : MonoBehaviour
         if (InputManager.Instance != null)
         {
             InputManager.Instance.DoPlant -= OnFarmingAction;
-            TimeManager.Instance.OnDayEnd -= NextDayStart;
+            FairyManager.Instance.OnFairyEventStarted -= NextDayStart;
         }
     }
 
@@ -176,7 +178,7 @@ public class CharacterFarm : MonoBehaviour
 
         waterFill.currentWaterAmount = waterFill.maxWaterAmount;
         UIManager.Instance.UpdateWaterText(waterFill.currentWaterAmount);
-        return true; 
+        return true;
     }
 
     private void PerformFarmingAction()
@@ -186,7 +188,7 @@ public class CharacterFarm : MonoBehaviour
 
         switch (ModeManager.Instance.currentWork)
         {
-            case FarmingState.Dirt: 
+            case FarmingState.Dirt:
                 DoPlow(closestTile);
                 break;
             case FarmingState.PlantParsnip:
@@ -216,26 +218,29 @@ public class CharacterFarm : MonoBehaviour
             case FarmingState.Fertilize:
                 Fertilize(closestTile);
                 break;
+            case FarmingState.Scarecrow:
+                SetScarecrow();
+                break;
         }
     }
 
     public void DoPlow(Collider2D closestTile)
     {
         TilePrefabs tileInfo = closestTile.GetComponent<TilePrefabs>();
-        if (tileInfo.isDirtSpawned) return; 
+        if (tileInfo.isDirtSpawned) return;
+        if (tileInfo.isOccupiedByGiantCrop || tileInfo.isOccupiedByScarecrow) return;
 
         Vector3 spawnPosition = closestTile.transform.position;
         Instantiate(dirtPrefabs, spawnPosition + Vector3.up * dirtSpawnHeight, Quaternion.identity, closestTile.transform);
         closestTile.GetComponent<TilePrefabs>().isDirtSpawned = true;
         tileInfo.isDirtSpawned = true;
-        Debug.Log("���� ���ҽ��ϴ�.");
     }
 
     public void DoPlantParsnip(Collider2D closestTile)
     {
         TilePrefabs tileInfo = closestTile.GetComponent<TilePrefabs>();
 
-        if (!tileInfo.isDirtSpawned || tileInfo.isSeedSpawned) return;
+        if (!tileInfo.isDirtSpawned || tileInfo.isSeedSpawned || tileInfo.isOccupiedByGiantCrop || tileInfo.isOccupiedByScarecrow) return;
 
         if (CropManager.Instance.seedParsnip <= 0)
         {
@@ -425,7 +430,7 @@ public class CharacterFarm : MonoBehaviour
     }*/
     #endregion
 
-    public void Harvest(Collider2D closestTile)
+    /*public void Harvest(Collider2D closestTile)
     {
         CropBehaviour crop = closestTile.GetComponentInChildren<CropBehaviour>();
         if (crop == null) return;
@@ -490,10 +495,106 @@ public class CharacterFarm : MonoBehaviour
             tile.isDirtSpawned = false;
             tile.isSeedSpawned = false;
             tile.isOccupiedByGiantCrop = false;
-            tile.RemoveFertilizer(); // ��� ���� �Լ��� �ִٸ� ȣ��
+            tile.RemoveFertilizer(); 
+        }
+    }*/
+
+    public void Harvest(Collider2D closestTile)
+    {
+        // --- 유효성 검사 (초반 리턴 부분) ---
+        if (closestTile == null) return;
+
+        CropBehaviour crop = closestTile.GetComponentInChildren<CropBehaviour>();
+        if (crop == null) return;
+
+        if (crop.isEaten)
+        {
+            // 먹힌 작물 타일 초기화 로직 (기존과 동일)
+            foreach (Transform child in closestTile.gameObject.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            TilePrefabs tile = closestTile.GetComponent<TilePrefabs>();
+            tile.isDirtSpawned = false;
+            tile.isSeedSpawned = false;
+            return;
         }
 
-        // UIManager.Instance.UpdateHarvestText(); // ���� AddHarvestedItem ���ο��� ó���ϴ°� �� ����
+        if (!crop.IsFullyGrown()) return;
+
+        // --- 수확 준비 ---
+        Seed cropData = crop.cropData;
+        TilePrefabs tileInfo = closestTile.GetComponent<TilePrefabs>();
+
+        // ⭐️ 여기가 핵심적인 변경 부분입니다 ⭐️
+        if (cropData.isGiantCrop)
+        {
+            // 거대 작물일 경우, 확인 창을 띄웁니다.
+            UIManager.Instance.ShowConfirmationPopup(
+                onYes: () => {
+                    // "예"를 눌렀을 때만 실행될 거대 작물 수확 로직 전체
+                    int amountToHarvest = cropData.giantCropYield;
+
+                    if (amountToHarvest > 0)
+                    {
+                        CropManager.Instance.AddHarvestedItem(cropData.harvestedItemID, amountToHarvest);
+                    }
+
+                    List<TilePrefabs> tilesToReset = new List<TilePrefabs> { tileInfo };
+
+                    Vector2 leftPos = (Vector2)closestTile.transform.position + Vector2.left;
+                    Collider2D leftTileCollider = Physics2D.OverlapPoint(leftPos, plantableTileLayer);
+                    if (leftTileCollider != null) tilesToReset.Add(leftTileCollider.GetComponent<TilePrefabs>());
+
+                    Vector2 rightPos = (Vector2)closestTile.transform.position + Vector2.right;
+                    Collider2D rightTileCollider = Physics2D.OverlapPoint(rightPos, plantableTileLayer);
+                    if (rightTileCollider != null) tilesToReset.Add(rightTileCollider.GetComponent<TilePrefabs>());
+
+                    foreach (var tile in tilesToReset)
+                    {
+                        foreach (Transform child in tile.transform)
+                        {
+                            Destroy(child.gameObject);
+                        }
+                        tile.isDirtSpawned = false;
+                        tile.isSeedSpawned = false;
+                        tile.isOccupiedByGiantCrop = false;
+                        tile.RemoveFertilizer();
+                    }
+                },
+                onNo: () => {
+                    // "아니오"를 누르면 아무것도 하지 않고 로그만 남깁니다.
+                    Debug.Log("거대 작물 수확을 취소했습니다.");
+                }
+            );
+        }
+        else // 일반 작물일 경우
+        {
+            // 기존의 일반 작물 수확 로직을 그대로 실행합니다.
+            int amountToHarvest = 0;
+            if (tileInfo.isFertilized)
+            {
+                amountToHarvest = Random.Range(cropData.minFertilizedYield, cropData.maxFertilizedYield + 1);
+            }
+            else
+            {
+                amountToHarvest = Random.Range(cropData.minYield, cropData.maxYield + 1);
+            }
+
+            if (amountToHarvest > 0)
+            {
+                CropManager.Instance.AddHarvestedItem(cropData.harvestedItemID, amountToHarvest);
+            }
+
+            // 일반 작물은 타일 하나만 초기화합니다.
+            foreach (Transform child in tileInfo.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            tileInfo.isDirtSpawned = false;
+            tileInfo.isSeedSpawned = false;
+            tileInfo.RemoveFertilizer();
+        }
     }
 
     public void Fertilize(Collider2D closestTile)
@@ -533,5 +634,52 @@ public class CharacterFarm : MonoBehaviour
     public void NextDayStart(int newday)
     {
         gameObject.transform.position = newDayStartPosition;
+    }
+
+    private void SetScarecrow()
+    {
+        Collider2D closestTile = GetClosestTile();
+        if (closestTile == null || !closestTile.CompareTag("Tile")) return;
+
+        TilePrefabs tileInfo = closestTile.GetComponent<TilePrefabs>();
+
+        // 1. 해당 타일에 이미 허수아비가 있을 경우 -> '제거' 로직만 수행
+        if (tileInfo.isOccupiedByScarecrow)
+        {
+            // 자식 오브젝트를 안전하게 찾아서 파괴
+            ScarecrowScript scarecrow = tileInfo.GetComponentInChildren<ScarecrowScript>();
+            if (scarecrow != null)
+            {
+                Destroy(scarecrow.gameObject);
+            }
+
+            tileInfo.isOccupiedByScarecrow = false;
+            GameManager.Instance.scarecrowCount++; // 허수아비 개수 복구
+            UIManager.Instance.UpdateInventoryText(); // UI 업데이트
+
+            // '제거'를 했으므로 여기서 함수를 종료
+            UIManager.Instance.ShowScarecrowMessage("허수아비를 제거했습니다.");
+            return;
+        }
+
+        // 2. 허수아비가 없을 경우 -> '설치' 로직 수행
+
+        // 기능 추가: 설치할 허수아비가 남아있는지 확인
+        if (GameManager.Instance.scarecrowCount <= 0)
+        {
+            UIManager.Instance.ShowScarecrowMessage("허수아비가 부족합니다.");
+            return; // 허수아비가 없으면 함수 종료
+        }
+        if(tileInfo.isSeedSpawned == true || tileInfo.isDirtSpawned == true)
+        {
+            UIManager.Instance.ShowScarecrowMessage("작물이 심어진 타일에는 허수아비를 설치할 수 없습니다.");
+            return;
+        }
+        // 허수아비 설치
+        Vector3 spawnPosition = closestTile.transform.position;
+        Instantiate(scarecrowPrefabs, spawnPosition + Vector3.up * seedSpawnHeight, Quaternion.identity, closestTile.transform);
+        tileInfo.isOccupiedByScarecrow = true;
+        GameManager.Instance.scarecrowCount--; // 허수아비 개수 차감
+        UIManager.Instance.UpdateInventoryText(); // UI 업데이트
     }
 }
