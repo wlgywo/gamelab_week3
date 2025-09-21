@@ -4,6 +4,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public int playerMoney = 0; 
+    public int allEarnings = 0;
     public int fertilizerCount = 0;
 
     private void Awake()
@@ -23,6 +24,7 @@ public class GameManager : MonoBehaviour
     public void AddMoney(int amount)
     {
         playerMoney += amount;
+        allEarnings += amount;
         UIManager.Instance.UpdateMoneyText();
     }
 }

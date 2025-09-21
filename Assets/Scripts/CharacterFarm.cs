@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class CharacterFarm : MonoBehaviour
 {
+    #region OldCode
     /*public float interactionRange = 1.5f;
     public LayerMask plantableTileLayer;
     public LayerMask canHarvestLayer;
@@ -107,14 +108,16 @@ public class CharacterFarm : MonoBehaviour
         }
     }*/
 
-    [Header("»óÈ£ÀÛ¿ë ¼³Á¤")]
+    #endregion
+
+    [Header("ï¿½ï¿½È£ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½")]
     public float interactionRange = 1.5f;
     public LayerMask plantableTileLayer;
 
-    [Header("ÇÁ¸®ÆÕ ¹× ÀÌÆåÆ®")]
-    public GameObject dirtPrefabs; // SpawnDirt¿¡¼­ °¡Á®¿Â º¯¼ö
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®")]
+    public GameObject dirtPrefabs; // SpawnDirtï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     public GameObject parsnipPrefabs;
-    public GameObject carrotPrefabs; // SpawnDirt¿¡¼­ °¡Á®¿Â º¯¼ö
+    public GameObject carrotPrefabs; // SpawnDirtï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     public GameObject radishPrefabs;
     public GameObject potatoPrefabs;
     public GameObject eggplantPrefabs;
@@ -125,13 +128,25 @@ public class CharacterFarm : MonoBehaviour
     WaterFillScript waterFill;
     CharacterGroundCheck groundCheck;
 
-    [Header("¿ÀºêÁ§Æ® ·¹ÆÛ·±½º")]
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½Û·ï¿½ï¿½ï¿½")]
     [SerializeField] GameObject characterSprite;
+
+    [Header("ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½")]
+    public Vector3 newDayStartPosition;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        InputManager.Instance.DoPlant += PerformFarmingAction;
+        InputManager.Instance.DoPlant += OnFarmingAction;
+        TimeManager.Instance.OnDayEnd += NextDayStart;
+        {
+            if (waterFill != null)
+            {
+                waterFill.currentWaterAmount = waterFill.maxWaterAmount;
+                UIManager.Instance.UpdateWaterText(waterFill.currentWaterAmount);
+            }
+        };
+
         waterFill = gameObject.GetComponent<WaterFillScript>();
         groundCheck = gameObject.GetComponent<CharacterGroundCheck>();
     }
@@ -140,9 +155,30 @@ public class CharacterFarm : MonoBehaviour
     {
         if (InputManager.Instance != null)
         {
-            InputManager.Instance.DoPlant -= PerformFarmingAction;
+            InputManager.Instance.DoPlant -= OnFarmingAction;
+            TimeManager.Instance.OnDayEnd -= NextDayStart;
         }
     }
+
+    private void OnFarmingAction()
+    {
+        if (TryRefillWater()) return;
+        PerformFarmingAction();
+    }
+
+    private bool TryRefillWater()
+    {
+        if (ModeManager.Instance.currentWork != FarmingState.Water || !groundCheck.GetOnWater())
+            return false;
+
+        if (waterFill.currentWaterAmount >= waterFill.maxWaterAmount)
+            return false;
+
+        waterFill.currentWaterAmount = waterFill.maxWaterAmount;
+        UIManager.Instance.UpdateWaterText(waterFill.currentWaterAmount);
+        return true; 
+    }
+
     private void PerformFarmingAction()
     {
         Collider2D closestTile = GetClosestTile();
@@ -192,7 +228,7 @@ public class CharacterFarm : MonoBehaviour
         Instantiate(dirtPrefabs, spawnPosition + Vector3.up * dirtSpawnHeight, Quaternion.identity, closestTile.transform);
         closestTile.GetComponent<TilePrefabs>().isDirtSpawned = true;
         tileInfo.isDirtSpawned = true;
-        Debug.Log("¶¥À» °¥¾Ò½À´Ï´Ù.");
+        Debug.Log("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ò½ï¿½ï¿½Ï´ï¿½.");
     }
 
     public void DoPlantParsnip(Collider2D closestTile)
@@ -299,12 +335,12 @@ public class CharacterFarm : MonoBehaviour
         //waterEffect.Play();
         //UIManager.Instance.UpdateWaterText(waterFill.currentWaterAmount);
 
-        if (groundCheck.GetOnWater() && waterFill.currentWaterAmount < waterFill.maxWaterAmount)
+        /*if (groundCheck.GetOnWater() && waterFill.currentWaterAmount < waterFill.maxWaterAmount)
         {
             waterFill.currentWaterAmount = waterFill.maxWaterAmount;
             UIManager.Instance.UpdateWaterText(waterFill.currentWaterAmount);
             return; 
-        }
+        }*/
 
         if (waterFill.currentWaterAmount <= 0)
         {
@@ -322,6 +358,7 @@ public class CharacterFarm : MonoBehaviour
         UIManager.Instance.UpdateWaterText(waterFill.currentWaterAmount);
     }
 
+    #region OldHarvestCode
     /*public void Harvest(Collider2D closestTile)
     {
         CropBehaviour crop = closestTile.GetComponentInChildren<CropBehaviour>();
@@ -350,8 +387,8 @@ public class CharacterFarm : MonoBehaviour
 
         if (crop.cropData.cropName == "GiantParsnip")
         {
-            // 3. °Å´ë ÀÛ¹°ÀÌ¶ó¸é, ¿ÞÂÊ°ú ¿À¸¥ÂÊ Å¸ÀÏÀ» Ã£½À´Ï´Ù.
-            // ¿ÞÂÊ Å¸ÀÏ Ã£±â
+            // 3. ï¿½Å´ï¿½ ï¿½Û¹ï¿½ï¿½Ì¶ï¿½ï¿½, ï¿½ï¿½ï¿½Ê°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ Ã£ï¿½ï¿½ï¿½Ï´ï¿½.
+            // ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ Ã£ï¿½ï¿½
             Vector2 leftPos = (Vector2)closestTile.transform.position + Vector2.left;
             Collider2D leftTileCollider = Physics2D.OverlapPoint(leftPos, plantableTileLayer);
             if (leftTileCollider != null)
@@ -370,7 +407,7 @@ public class CharacterFarm : MonoBehaviour
                 rightTileCollider.GetComponent<TilePrefabs>().RemoveFertilizer();
             }
 
-            // ¼öÈ®·® Áõ°¡
+            // ï¿½ï¿½È®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             CropManager.Instance.harvestAmountParsnip += 10;
         }
         UIManager.Instance.UpdateHarvestText();
@@ -386,6 +423,7 @@ public class CharacterFarm : MonoBehaviour
         tileInfo.isSeedSpawned = false;
         tileInfo.RemoveFertilizer();
     }*/
+    #endregion
 
     public void Harvest(Collider2D closestTile)
     {
@@ -452,10 +490,10 @@ public class CharacterFarm : MonoBehaviour
             tile.isDirtSpawned = false;
             tile.isSeedSpawned = false;
             tile.isOccupiedByGiantCrop = false;
-            tile.RemoveFertilizer(); // ºñ·á Á¦°Å ÇÔ¼ö°¡ ÀÖ´Ù¸é È£Ãâ
+            tile.RemoveFertilizer(); // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½ È£ï¿½ï¿½
         }
 
-        // UIManager.Instance.UpdateHarvestText(); // ÀÌÁ¨ AddHarvestedItem ³»ºÎ¿¡¼­ Ã³¸®ÇÏ´Â°Ô ´õ ÁÁÀ½
+        // UIManager.Instance.UpdateHarvestText(); // ï¿½ï¿½ï¿½ï¿½ AddHarvestedItem ï¿½ï¿½ï¿½Î¿ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ï´Â°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     }
 
     public void Fertilize(Collider2D closestTile)
@@ -490,5 +528,10 @@ public class CharacterFarm : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, interactionRange);
+    }
+
+    public void NextDayStart(int newday)
+    {
+        gameObject.transform.position = newDayStartPosition;
     }
 }

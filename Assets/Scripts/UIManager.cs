@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Serialization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -15,6 +17,11 @@ public class UIManager : MonoBehaviour
     public TMP_Text harvetText;
     public TMP_Text moneyText;
     public TMP_Text waterText;
+    public TMP_Text weatherProbabilityText;
+
+    public GameObject mainCanvas;
+
+    [Header("인벤토리 텍스트")]
     public TMP_Text inventoryText_Fertilizer;
     public TMP_Text inventoryText_Parsnip;
     public TMP_Text inventoryText_Carrot;
@@ -22,12 +29,23 @@ public class UIManager : MonoBehaviour
     public TMP_Text inventoryText_Potato;  
     public TMP_Text inventoryText_Eggplant;
     public TMP_Text inventoryText_Pumpkin;
-
+    
 
     public GameObject storeNoticeText;
     public GameObject sellNoticeText;
+    public GameObject oneRoomNoticeText;
     public GameObject storeUI;
     public GameObject sellUI;
+    public GameObject oneRoomUI;
+
+    [Header("페이드 효과")]
+    public Image fadeImage;
+    public float fadeDuration = 1f;
+    public bool canProceedToNextDay = false;
+
+    public TMP_Text continueText;
+    public TMP_Text todayEarningText;
+    public int earning = 0;
 
     [Header("텍스트 색상")]
     public Color defaultColor = Color.white;
@@ -47,10 +65,16 @@ public class UIManager : MonoBehaviour
     {
         TimeManager.Instance.OnHourChanged += UpdateTimeDisplay;
         TimeManager.Instance.OnDayStart += UpdateTimeDisplay;
+        //TimeManager.Instance.OnDayStart += StartFadeIn;
+        //TimeManager.Instance.OnDayEnd += StartFadeOut;
+        // TimeManager.Instance.OnFadeStart += () => StartCoroutine(DayTransitionCoroutine());
+
         ModeManager.Instance.ChangeModeText += UpdateModeText;
+
         UpdateTimeDisplay(TimeManager.Instance.CurrentHour);
         UpdateInventoryText();
         UpdateWaterText(100f);
+        UpdateWeatherProbabilityText();
     }
 
     void OnDisable()
@@ -59,6 +83,10 @@ public class UIManager : MonoBehaviour
         {
             TimeManager.Instance.OnHourChanged -= UpdateTimeDisplay;
             TimeManager.Instance.OnDayStart -= UpdateTimeDisplay;
+            //TimeManager.Instance.OnDayStart -= StartFadeIn;
+            //TimeManager.Instance.OnDayEnd -= StartFadeOut;
+            // TimeManager.Instance.OnFadeStart -= () => StartCoroutine(DayTransitionCoroutine());
+
             ModeManager.Instance.ChangeModeText -= UpdateModeText;
         }
     }
@@ -96,11 +124,19 @@ public class UIManager : MonoBehaviour
     public void ToggleStoreUI()
     {
         storeUI.SetActive(!storeUI.activeSelf);
+        InputManager.Instance.isPlayerInputLocked = storeUI.activeSelf;
     }
 
     public void ToggleSellUI()
     {
         sellUI.SetActive(!sellUI.activeSelf);
+        InputManager.Instance.isPlayerInputLocked = sellUI.activeSelf;
+    }
+
+    public void ToggleOneRoomUI()
+    {
+        oneRoomUI.SetActive(!oneRoomUI.activeSelf);
+        InputManager.Instance.isPlayerInputLocked = oneRoomUI.activeSelf;
     }
     
     public void ShowSellNoticeText()
@@ -115,12 +151,23 @@ public class UIManager : MonoBehaviour
 
     public void ShowStoreNoticeText()
     {
+        storeNoticeText.GetComponent<TextMeshProUGUI>().text = $"- 상점 -\n >> 들어가기 [E] <<";
         storeNoticeText.SetActive(true);
     }
 
     public void HideStoreNoticeText()
     {
         storeNoticeText.SetActive(false);
+    }
+
+    public void ShowOneRoomNoticeText()
+    {
+        oneRoomNoticeText.SetActive(true);
+    }
+
+    public void HideOneRoomNoticeText()
+    {
+        oneRoomNoticeText.SetActive(false);
     }
 
     public void UpdateMoneyText()
@@ -161,5 +208,121 @@ public class UIManager : MonoBehaviour
     public void UpdateWaterText(float waterAmount)
     {
         waterText.text = $"2. 물뿌리개 (현재 물 양: {waterAmount})";
+    }
+
+    public void UpdateWeatherProbabilityText()
+    {
+        float probabilityPercent = WeatherManager.Instance.probability * 100f;
+        weatherProbabilityText.text = $"강수 확률: {probabilityPercent.ToString("F0")}%";
+    }
+
+    public void UpdateTodayEarningText()
+    {
+        todayEarningText.text = $"{TimeManager.Instance.CurrentDay-1} 일차\n오늘의 수익\n{earning} 원\n총 수익\n{GameManager.Instance.allEarnings} 원";
+    }
+
+    /*
+    public void StartFadeIn(int newday)
+    {
+        StartCoroutine(FadeIn());
+    }
+
+    public void StartFadeOut(int newday)
+    {
+        StartCoroutine(FadeOut());
+    }
+
+    IEnumerator FadeIn()
+    {
+        float t = 0;
+        Color color = fadeImage.color;
+        while (t < fadeDuration)
+        {
+            t += Time.deltaTime;
+            color.a = t / fadeDuration;
+            fadeImage.color = color;
+            yield return null;
+        }
+    }
+
+    IEnumerator FadeOut()
+    {
+        float t = fadeDuration;
+        Color color = fadeImage.color;
+        while (t > 0f)
+        {
+            t -= Time.deltaTime;
+            color.a = t / fadeDuration;
+            fadeImage.color = color;
+            yield return null;
+        }
+    }
+    */
+    /*IEnumerator DayTransitionCoroutine()
+    {
+        InputManager.Instance.isPlayerInputLocked = true;
+        float t = 0;
+        Color color = fadeImage.color;
+        while (t < fadeDuration)
+        {
+            t += Time.unscaledDeltaTime;
+            color.a = Mathf.Clamp01(t / fadeDuration);
+            fadeImage.color = color;
+            yield return null;
+        }
+
+        UpdateTodayEarningText();
+        mainCanvas.SetActive(false);
+        Time.timeScale = 0f;
+        continueText.gameObject.SetActive(true);
+        todayEarningText.gameObject.SetActive(true);
+
+        canProceedToNextDay = false;
+        yield return null;
+        yield return new WaitUntil(() => canProceedToNextDay);
+
+
+        mainCanvas.SetActive(true);
+        Time.timeScale = 1f;
+        continueText.gameObject.SetActive(false);
+        todayEarningText.gameObject.SetActive(false);
+
+
+        t = fadeDuration;
+        while (t > 0f)
+        {
+            t -= Time.unscaledDeltaTime;
+            color.a = Mathf.Clamp01(t / fadeDuration);
+            fadeImage.color = color;
+            yield return null;
+        }
+
+        InputManager.Instance.isPlayerInputLocked = false;
+    }*/
+
+    public IEnumerator FadeOut()
+    {
+        float t = 0;
+        Color color = fadeImage.color;
+        while (t < fadeDuration)
+        {
+            t += Time.unscaledDeltaTime;
+            color.a = Mathf.Clamp01(t / fadeDuration);
+            fadeImage.color = color;
+            yield return null;
+        }
+    }
+
+    public IEnumerator FadeIn()
+    {
+        float t = fadeDuration;
+        Color color = fadeImage.color;
+        while (t > 0f)
+        {
+            t -= Time.unscaledDeltaTime;
+            color.a = Mathf.Clamp01(t / fadeDuration);
+            fadeImage.color = color;
+            yield return null;
+        }
     }
 }

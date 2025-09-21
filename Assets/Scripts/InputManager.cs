@@ -6,7 +6,8 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     public static InputManager Instance { get; private set; }
-    public PlayerInput playerInput { get; private set; }
+    public bool isPlayerInputLocked = false; 
+    public PlayerInput playerInput; // { get; private set; }
     public event Action OnFill;
     public event Action StopFill;
     public event Action PressA;
@@ -65,6 +66,7 @@ public class InputManager : MonoBehaviour
         playerInput.Player.MovementHoriAxis.canceled += OnHoriAxis;
         playerInput.Player.Interaction.performed += OnInteract;
         playerInput.Player.ModeSwitch.performed += SwitchMode;
+        playerInput.UI.SpaceContinue.performed += OnContinue;
 
     }
 
@@ -85,6 +87,7 @@ public class InputManager : MonoBehaviour
         playerInput.Player.MovementHoriAxis.canceled -= OnHoriAxis;
         playerInput.Player.Interaction.performed -= OnInteract;
         playerInput.Player.ModeSwitch.performed -= SwitchMode;
+        playerInput.UI.SpaceContinue.performed -= OnContinue;
 
         playerInput.Player.Disable();
     }
@@ -211,7 +214,7 @@ public class InputManager : MonoBehaviour
 
     // 일시정지 - ESC
     public void OnPause(InputAction.CallbackContext context)
-    {
+    {/*
         if (context.performed)
         {
             Time.timeScale = Time.timeScale == 0 ? 1 : 0;
@@ -225,7 +228,7 @@ public class InputManager : MonoBehaviour
                 TestDisable();
             }
             Debug.Log("Pause");
-        }
+        }*/
     }
 
 
@@ -271,6 +274,7 @@ public class InputManager : MonoBehaviour
     private void SpaceStarted(InputAction.CallbackContext context)
     {
         SpacePressed?.Invoke();
+        UIManager.Instance.canProceedToNextDay = true;
     }
     private void SpaceCanceled(InputAction.CallbackContext context)
     {
@@ -310,6 +314,7 @@ public class InputManager : MonoBehaviour
 
     private void OnHoriAxis(InputAction.CallbackContext context)
      {
+        if(isPlayerInputLocked) return;
         float movement = context.ReadValue<float>();
         MovementAD?.Invoke(movement);
     }
@@ -334,6 +339,12 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    private void OnContinue(InputAction.CallbackContext context)
+    {
+       
+            TimeManager.Instance.canProceedToNextDay = true;
+        
+    }
     //public void ClearAllInputs()
     //{
     //    MovementAD?.Invoke(0f);

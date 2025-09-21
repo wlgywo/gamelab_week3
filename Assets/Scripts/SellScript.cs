@@ -49,9 +49,11 @@ public class SellScript : MonoBehaviour
 
         if (totalEarnings > 0)
         {
+
             GameManager.Instance.AddMoney(totalEarnings);
             inventory.Clear();
             UIManager.Instance.UpdateHarvestText();
+            UIManager.Instance.earning = totalEarnings;
         }
     }
 

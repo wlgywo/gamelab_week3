@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class StoreScript : MonoBehaviour
@@ -10,6 +11,10 @@ public class StoreScript : MonoBehaviour
     [SerializeField] private int parsnipSeedPrice = 20;
     [SerializeField] private int carrotSeedPrice = 30;
     [SerializeField] private int radishSeedPrice = 40;
+    [SerializeField] private int potatoSeedPrice = 40;
+    [SerializeField] private int eggplantSeedPrice = 40;
+    [SerializeField] private int pumpkinSeedPrice = 40;
+    [SerializeField] private int prayRainPrice = 100;
 
     void Start()
     {
@@ -129,9 +134,9 @@ public class StoreScript : MonoBehaviour
     public void BuyPotatoSeed()
     {
         int currentPlayerMoney = GameManager.Instance.playerMoney;
-        if (currentPlayerMoney >= radishSeedPrice)
+        if (currentPlayerMoney >= potatoSeedPrice)
         {
-            GameManager.Instance.playerMoney -= radishSeedPrice;
+            GameManager.Instance.playerMoney -= potatoSeedPrice;
             CropManager.Instance.seedPotato++;
 
             UIManager.Instance.UpdateMoneyText();
@@ -146,9 +151,9 @@ public class StoreScript : MonoBehaviour
     public void BuyEggplantSeed()
     {
         int currentPlayerMoney = GameManager.Instance.playerMoney;
-        if (currentPlayerMoney >= radishSeedPrice)
+        if (currentPlayerMoney >= eggplantSeedPrice)
         {
-            GameManager.Instance.playerMoney -= radishSeedPrice;
+            GameManager.Instance.playerMoney -= eggplantSeedPrice;
             CropManager.Instance.seedEggplant++;
 
             UIManager.Instance.UpdateMoneyText();
@@ -163,12 +168,32 @@ public class StoreScript : MonoBehaviour
     public void BuyPumpkinSeed()
     {
         int currentPlayerMoney = GameManager.Instance.playerMoney;
-        if (currentPlayerMoney >= radishSeedPrice)
+        if (currentPlayerMoney >= pumpkinSeedPrice)
         {
-            GameManager.Instance.playerMoney -= radishSeedPrice;
+            GameManager.Instance.playerMoney -= pumpkinSeedPrice;
             CropManager.Instance.seedPumpkin++;
             UIManager.Instance.UpdateMoneyText();
             UIManager.Instance.UpdateInventoryText();
+        }
+        else
+        {
+            // "돈 부족" 팝업을 여기에 추가
+        }
+    }
+
+    public void BuyPrayRain()
+    {
+        int currentPlayerMoney = GameManager.Instance.playerMoney;
+        if (currentPlayerMoney >= prayRainPrice && WeatherManager.Instance.probability < 0.8f)
+        {
+            GameManager.Instance.playerMoney -= prayRainPrice; 
+            WeatherManager.Instance.probability += 0.05f;
+            UIManager.Instance.UpdateMoneyText();
+            UIManager.Instance.UpdateWeatherProbabilityText();
+        }
+        else if(WeatherManager.Instance.probability >= 0.8f)
+        {
+            UIManager.Instance.storeNoticeText.GetComponent<TextMeshProUGUI>().text = "강수 확률이 최대입니다!";
         }
         else
         {
