@@ -134,7 +134,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropData: {fileID: 11400000, guid: 6e6997bc1c77d9848aff5283ba224268, type: 2}
+  originalCropLike: {fileID: 11400000, guid: 12e77e392ea43bd41aee368b33580baa, type: 2}
+  cropLikeInstance: {fileID: 0}
   growthStageObjects: []
+  daysSincePlanted: 0
   isEaten: 0
 --- !u!1 &7844618133374701919
 GameObject:

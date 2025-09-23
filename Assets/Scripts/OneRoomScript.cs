@@ -52,10 +52,11 @@ public class OneRoomScript : MonoBehaviour
         if(other.CompareTag("Player"))
         {
             UIManager.Instance.HideOneRoomNoticeText();
-            if (UIManager.Instance.oneRoomUI.activeSelf)
-            {
-                UIManager.Instance.oneRoomUI.SetActive(false);
-            }
+            if(UIManager.Instance != null && UIManager.Instance.oneRoomUI != null && UIManager.Instance.oneRoomUI.activeSelf)
+                if (UIManager.Instance.oneRoomUI.activeSelf)
+                {
+                    UIManager.Instance.oneRoomUI.SetActive(false);
+                }
             isPlayerInRange = false;
         }
     }

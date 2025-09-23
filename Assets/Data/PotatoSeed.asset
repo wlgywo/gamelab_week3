@@ -15,12 +15,30 @@ MonoBehaviour:
   cropName: Potato
   cropDescription: 
   harvestedItemID: "\uAC10\uC790"
-  growthDays: 4
+  growthDays: 8
   minYield: 1
   maxYield: 1
   minFertilizedYield: 2
   maxFertilizedYield: 4
   isGiantCrop: 0
   giantCropYield: 10
-  sellPrice: 350
+  sellPrice: 80
   giantVersionPrefab: {fileID: 8932975428292407836, guid: bfd260dae0fee6444bf4a30e82ff1321, type: 3}
+  dialoguesForSmallLike:
+  - "\"\uC544... \uC548\uB155...\""
+  - "\"\uC624\uB298\uB3C4... \uB0A0\uC528\uB294... \uC88B\uB124...\""
+  - "\"\uD759\uC774... \uB530\uB73B\uD574\uC11C... \uC7A0\uC774 \uC640...\""
+  dialoguesForHate:
+  - "\"\uC73C\uC74C...? \uD654... \uB0AC\uC5B4? \uB098\uD55C\uD14C...?\""
+  - "\"\uC5BC\uAD74\uC774... \uBB34\uC11C\uC6CC... \uC800\uB9AC \uAC00\uC8FC\uBA74...
+    \uC548\uB420\uAE4C...\""
+  - "\"\uB098\uB294... \uADF8\uB0E5... \uAC00\uB9CC\uD788 \uC788\uC744 \uBFD0\uC778\uB370...\""
+  dialoguesForMidLike:
+  - "\"\uB124\uAC00 \uC640\uC11C... \uC88B\uB2E4...\""
+  - "\"\uBB3C\uC774... \uC2DC\uC6D0\uD574... \uACE0\uB9C8\uC6CC...\""
+  - "\"\uB124 \uBC2D\uC740... \uD3B8\uC548\uD574\uC11C... \uC88B\uC544...\""
+  dialoguesForVeryLike:
+  - "\"\uB098\uB294... \uB110 \uC704\uD574... \uC544\uC8FC \uB9DB\uC788\uB294 \uAC10\uC790\uAC00...
+    \uB420 \uAC70\uC57C.\""
+  - "\"\uB124\uAC00 \uC788\uC73C\uBA74... \uB9C8\uC74C\uC774... \uD3B8\uC548\uD574...\""
+  - "\"\uC6B0\uB9AC\uB294... \uC88B\uC740... \uCE5C\uAD6C... \uAC19\uC544...\"  "

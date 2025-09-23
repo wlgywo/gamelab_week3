@@ -4,6 +4,8 @@ using UnityEngine;
 public class CropBehaviour : MonoBehaviour
 {
     public Seed cropData;
+    [SerializeField] private SeedLike originalCropLike;
+    public SeedLike cropLikeInstance;
 
     public GameObject[] growthStageObjects;
 
@@ -13,10 +15,19 @@ public class CropBehaviour : MonoBehaviour
 
     private Vector3[] originalScales;
 
+    void Awake()
+    {
+        if (originalCropLike != null)
+        {
+            cropLikeInstance = Instantiate(originalCropLike);
+        }
+        else
+        {
+            Debug.LogError("CropBehaviour에서 복제할 오브젝트가 할당되지 않았습니다!", this.gameObject);
+        }
+    }
     private void Start()
     {
-        
-
         originalScales = new Vector3[growthStageObjects.Length];
         for (int i = 0; i < growthStageObjects.Length; i++)
         {

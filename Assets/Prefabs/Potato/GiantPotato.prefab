@@ -359,5 +359,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropData: {fileID: 11400000, guid: 23b7658596c26be4ea87505df6f3d644, type: 2}
+  originalCropLike: {fileID: 11400000, guid: b75cc0e8e95b7444c80e3ec009129bf9, type: 2}
+  cropLikeInstance: {fileID: 0}
   growthStageObjects: []
+  daysSincePlanted: 0
   isEaten: 0

@@ -7,6 +7,10 @@ public class GameManager : MonoBehaviour
     public int allEarnings = 0;
     public int fertilizerCount = 0;
     public int scarecrowCount = 0;
+    public int manureCount = 0;
+    public int pesticideCount = 0;
+    public int nutritionCount = 0;
+    public int marryCount = 0;
 
     private void Awake()
     {
@@ -27,5 +31,14 @@ public class GameManager : MonoBehaviour
         playerMoney += amount;
         allEarnings += amount;
         UIManager.Instance.UpdateMoneyText();
+    }
+
+    public void AddMarryCount()
+    {
+        marryCount++;
+        if (marryCount >= 4)
+        {
+            // UIManager.Instance.ShowMarryNoticeText();
+        }
     }
 }

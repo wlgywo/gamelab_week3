@@ -253,6 +253,24 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ModeScroll"",
+                    ""type"": ""Value"",
+                    ""id"": ""42aebc74-635b-4177-b647-ff65e6a197f4"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""DebugMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""34e58dac-75b3-4fd2-9cb1-02ab2322a141"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -713,7 +731,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""MovementHoriAxis"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -724,7 +742,40 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""MovementHoriAxis"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""e54f6fc8-da23-458b-af6a-2b05269271a4"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
                     ""groups"": """",
+                    ""action"": ""MovementHoriAxis"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Negative"",
+                    ""id"": ""5496db45-3de2-432a-887d-0eacbfa7730e"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""MovementHoriAxis"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Positive"",
+                    ""id"": ""d90fb2e4-f760-4768-bfd9-a68f2ffa2465"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""MovementHoriAxis"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -858,6 +909,39 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""ModeSwitch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d42f9de4-f874-4217-84e3-aa3e8405e8d4"",
+                    ""path"": ""<Keyboard>/f2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""ModeSwitch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c2220249-5bba-4d82-934b-07ab1b2d5db2"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""ModeScroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""76fbcb81-2301-4dcd-80fa-b615acb68ffc"",
+                    ""path"": ""<Keyboard>/f12"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""DebugMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1483,6 +1567,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_MovementHoriAxis = m_Player.FindAction("MovementHoriAxis", throwIfNotFound: true);
         m_Player_Interaction = m_Player.FindAction("Interaction", throwIfNotFound: true);
         m_Player_ModeSwitch = m_Player.FindAction("ModeSwitch", throwIfNotFound: true);
+        m_Player_ModeScroll = m_Player.FindAction("ModeScroll", throwIfNotFound: true);
+        m_Player_DebugMode = m_Player.FindAction("DebugMode", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1595,6 +1681,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_MovementHoriAxis;
     private readonly InputAction m_Player_Interaction;
     private readonly InputAction m_Player_ModeSwitch;
+    private readonly InputAction m_Player_ModeScroll;
+    private readonly InputAction m_Player_DebugMode;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1679,6 +1767,14 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @ModeSwitch => m_Wrapper.m_Player_ModeSwitch;
         /// <summary>
+        /// Provides access to the underlying input action "Player/ModeScroll".
+        /// </summary>
+        public InputAction @ModeScroll => m_Wrapper.m_Player_ModeScroll;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/DebugMode".
+        /// </summary>
+        public InputAction @DebugMode => m_Wrapper.m_Player_DebugMode;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Player; }
@@ -1758,6 +1854,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @ModeSwitch.started += instance.OnModeSwitch;
             @ModeSwitch.performed += instance.OnModeSwitch;
             @ModeSwitch.canceled += instance.OnModeSwitch;
+            @ModeScroll.started += instance.OnModeScroll;
+            @ModeScroll.performed += instance.OnModeScroll;
+            @ModeScroll.canceled += instance.OnModeScroll;
+            @DebugMode.started += instance.OnDebugMode;
+            @DebugMode.performed += instance.OnDebugMode;
+            @DebugMode.canceled += instance.OnDebugMode;
         }
 
         /// <summary>
@@ -1823,6 +1925,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @ModeSwitch.started -= instance.OnModeSwitch;
             @ModeSwitch.performed -= instance.OnModeSwitch;
             @ModeSwitch.canceled -= instance.OnModeSwitch;
+            @ModeScroll.started -= instance.OnModeScroll;
+            @ModeScroll.performed -= instance.OnModeScroll;
+            @ModeScroll.canceled -= instance.OnModeScroll;
+            @DebugMode.started -= instance.OnDebugMode;
+            @DebugMode.performed -= instance.OnDebugMode;
+            @DebugMode.canceled -= instance.OnDebugMode;
         }
 
         /// <summary>
@@ -2260,6 +2368,20 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnModeSwitch(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ModeScroll" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnModeScroll(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DebugMode" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDebugMode(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

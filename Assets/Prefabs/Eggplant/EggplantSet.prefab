@@ -67,11 +67,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropData: {fileID: 11400000, guid: e7240419b02d3d041ba40a27c423f818, type: 2}
+  originalCropLike: {fileID: 11400000, guid: c6b811cae6b4981478fe05acd4da1ed6, type: 2}
+  cropLikeInstance: {fileID: 0}
   growthStageObjects:
   - {fileID: 2072204575763593141}
   - {fileID: 6018802190436369353}
   - {fileID: 1646947940159837956}
   - {fileID: 2776747685269732766}
+  daysSincePlanted: 0
   isEaten: 0
 --- !u!1001 &3280781171864417510
 PrefabInstance:

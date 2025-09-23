@@ -21,8 +21,9 @@ public class CharacterGroundCheck : MonoBehaviour
 
     //public bool GetOnGround() { return onGround; }
 
-    private bool onGround;
-    private bool onWater;
+    [SerializeField] private bool onGround;
+    [SerializeField] private bool onWater;
+    public float WaterOffset = 0f;
 
     [Header("Ground Collider")]
     [SerializeField] private float groundLength = 1.0f;
@@ -38,8 +39,20 @@ public class CharacterGroundCheck : MonoBehaviour
 
         onGround = hit1.collider != null || hit2.collider != null;
 
-        onWater = (hit1.collider != null && hit1.collider.CompareTag("Pond")) ||
-                  (hit2.collider != null && hit2.collider.CompareTag("Pond"));
+
+        Vector2 checkPoint = new Vector2(transform.position.x, transform.position.y - WaterOffset);
+
+        Collider2D waterCollider = Physics2D.OverlapPoint(checkPoint);
+
+        onWater = waterCollider != null && waterCollider.CompareTag("Pond");
+        if (onWater)
+        {
+            UIManager.Instance.ShowWaterCanFillTextUI();
+        }
+        else
+        {
+            UIManager.Instance.HideWaterCanFillTextUI();
+        }
     }
 
     public bool GetOnGround() { return onGround; }

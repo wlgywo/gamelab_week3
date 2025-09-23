@@ -11,7 +11,7 @@ public class FairyManager : MonoBehaviour
 
     [Header("요정 이벤트 설정")]
     [SerializeField, Range(0f, 1f)]
-    private float fairyAppearChance = 0.1f; // 요정 등장 확률 (10%)
+    public float fairyAppearChance = 0.1f; // 요정 등장 확률 (10%)
 
     [Header("요정 스폰 설정")]
     public GameObject fairyPrefab; // 인스펙터에서 요정 프리팹을 할당
@@ -119,7 +119,7 @@ public class FairyManager : MonoBehaviour
 
             // ★ 핵심: ManualUpdate를 매 프레임 호출
             cineBrain.ManualUpdate();
-
+            Camera.main.transform.position = new Vector3(fairy.transform.position.x, fairy.transform.position.y, -10);
             yield return null;
         }
 
@@ -141,8 +141,44 @@ public class FairyManager : MonoBehaviour
     /// </summary>
     private List<List<TilePrefabs>> FindValidSevenTileLines(List<TilePrefabs> allTiles)
     {
+        /* var validLines = new List<List<TilePrefabs>>();
+         HashSet<TilePrefabs> processedTiles = new HashSet<TilePrefabs>();
+         var sortedTiles = allTiles.OrderBy(t => t.transform.position.x).ThenBy(t => t.transform.position.y).ToList();
+
+         foreach (TilePrefabs startTile in sortedTiles)
+         {
+             if (processedTiles.Contains(startTile)) continue;
+
+             List<TilePrefabs> currentLine = new List<TilePrefabs>();
+             for (int i = 0; i < 7; i++)
+             {
+                 Vector2 targetPosition = (Vector2)startTile.transform.position + new Vector2(i, 0);
+                 TilePrefabs foundTile = sortedTiles.FirstOrDefault(t => (Vector2)t.transform.position == targetPosition);
+                 if (foundTile != null && foundTile.GetContainedCrop() != null)
+                 {
+                     currentLine.Add(foundTile);
+                 }
+                 else
+                 {
+                     currentLine.Clear();
+                     break;
+                 }
+             }
+
+             if (currentLine.Count == 7)
+             {
+                 validLines.Add(currentLine);
+                 foreach (var tile in currentLine)
+                 {
+                     processedTiles.Add(tile);
+                 }
+             }
+         }
+         return validLines;*/
+
         var validLines = new List<List<TilePrefabs>>();
         HashSet<TilePrefabs> processedTiles = new HashSet<TilePrefabs>();
+        // 타일을 x, y 좌표 순으로 정렬하여 탐색 효율을 높입니다.
         var sortedTiles = allTiles.OrderBy(t => t.transform.position.x).ThenBy(t => t.transform.position.y).ToList();
 
         foreach (TilePrefabs startTile in sortedTiles)
@@ -150,27 +186,37 @@ public class FairyManager : MonoBehaviour
             if (processedTiles.Contains(startTile)) continue;
 
             List<TilePrefabs> currentLine = new List<TilePrefabs>();
+            // 가로로 연속된 7칸 탐색
             for (int i = 0; i < 7; i++)
             {
                 Vector2 targetPosition = (Vector2)startTile.transform.position + new Vector2(i, 0);
                 TilePrefabs foundTile = sortedTiles.FirstOrDefault(t => (Vector2)t.transform.position == targetPosition);
+
+                // 타일이 존재하고, 해당 타일에 작물이 심어져 있어야 라인에 추가
                 if (foundTile != null && foundTile.GetContainedCrop() != null)
                 {
                     currentLine.Add(foundTile);
                 }
                 else
                 {
+                    // 연속된 라인이 끊기면 초기화하고 중단
                     currentLine.Clear();
                     break;
                 }
             }
 
+            // 7칸 라인을 성공적으로 찾았을 경우
             if (currentLine.Count == 7)
             {
-                validLines.Add(currentLine);
-                foreach (var tile in currentLine)
+                // ★ 핵심 변경점: 라인에 있는 작물 중 하나라도 덜 자란 것이 있는지 확인
+                if (currentLine.Any(tile => !tile.GetContainedCrop().IsFullyGrown()))
                 {
-                    processedTiles.Add(tile);
+                    // 덜 자란 작물이 하나라도 있다면, 유효한 라인으로 추가
+                    validLines.Add(currentLine);
+                    foreach (var tile in currentLine)
+                    {
+                        processedTiles.Add(tile);
+                    }
                 }
             }
         }
@@ -198,7 +244,7 @@ public class FairyManager : MonoBehaviour
         foreach (var tile in line)
         {
             CropBehaviour crop = tile.GetContainedCrop();
-            if (crop != null || !crop.IsFullyGrown())
+            if (crop != null && !crop.IsFullyGrown())
             {
                 crop.daysSincePlanted = crop.cropData.growthDays-1;
             }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.Rendering.Universal.PixelPerfectCamera;
 public class CharacterFarm : MonoBehaviour
 {
     #region OldCode
@@ -221,8 +223,90 @@ public class CharacterFarm : MonoBehaviour
             case FarmingState.Scarecrow:
                 SetScarecrow();
                 break;
+            case FarmingState.Talk:
+                Talk2GiantCrop(closestTile);
+                break;
+            case FarmingState.Pesticide:
+                GivePesticide(closestTile);
+                break;
+            case FarmingState.Manure:
+                GiveManure(closestTile);
+                break;
+            case FarmingState.Nutrition:
+                GiveNutrition(closestTile);
+                break;
         }
     }
+
+    public void Talk2GiantCrop(Collider2D closestTile)
+    {
+        TilePrefabs tileInfo = closestTile.GetComponent<TilePrefabs>();
+        Debug.Log("Talk to Giant Crop");
+
+        if (tileInfo == null || tileInfo.GetComponentInChildren<CropBehaviour>() == null) return;
+
+        Seed cropData = tileInfo.GetComponentInChildren<CropBehaviour>()?.cropData;
+        SeedLike cropLikeInstance = tileInfo.GetComponentInChildren<CropBehaviour>().cropLikeInstance;
+
+        if(cropData == null || cropLikeInstance == null)
+            return;
+
+        if (closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.isTodayAlreadyTalk)
+        {
+            string text = $"오늘 {cropData.cropName}에게 이미 말을 걸었습니다. ( 현재 호감도: {cropLikeInstance.likeability} )";
+            UIManager.Instance.NoticeSimpleLikeability(cropData.name, text);
+            return;
+        }
+
+        // 호감도 이상 결혼 ui 띄우기
+        if (cropLikeInstance.likeability >=50 && cropData.isGiantCrop)
+        {
+            closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.isTodayAlreadyTalk = true;
+
+            UIManager.Instance.ShowConfirmationMarry(
+                onYes: () => {
+                    UIManager.Instance.NoticeSimpleLikeability(cropData.cropName, SelectRandomMarryDialogue(closestTile));
+                    if(cropData.cropName == "거대무")
+                        UIManager.Instance.NoticeSimpleLikeability(cropData.cropName, $"{cropData.cropName}와(과) 결혼했습니다!  - 게임 클리어 -");
+                    else
+                        UIManager.Instance.NoticeSimpleLikeability(cropData.cropName, $"{cropData.cropName}와(과) 결혼했습니다!");
+                },
+                onNo: () => {
+                    cropLikeInstance.likeability = -10;
+                    string text = $"파혼을 시도하여 {cropData.cropName}의 호감도가 크게 감소했습니다. ( 호감도: {cropLikeInstance.likeability} )";
+                    UIManager.Instance.NoticeSimpleLikeability(name, SelectRandomHateDialogue(closestTile));
+                    UIManager.Instance.NoticeSimpleLikeability(name, text);
+                }
+            , cropLikeInstance.likeability, cropData.cropName);
+            return;
+        }
+
+        // 기본 말걸기
+        if (tileInfo.GetComponentInChildren<CropBehaviour>() != null && tileInfo.GetComponentInChildren<CropBehaviour>().cropData.isGiantCrop)
+        {
+            string name = cropData.cropName;
+
+            closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.likeability += 10;
+            closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.isTodayAlreadyTalk = true;
+            
+
+            string dialogue = "";
+            if (cropLikeInstance.likeability >= 0 && cropLikeInstance.likeability < 10)
+                dialogue = SelectRandomSmallLikeDialogue(closestTile);
+            else if (cropLikeInstance.likeability >= 10 && cropLikeInstance.likeability < 30)
+                dialogue = SelectRandomMidLikeDialogue(closestTile);
+            else if (cropLikeInstance.likeability >= 30 && cropLikeInstance.likeability < 50)
+                dialogue = SelectRandomVeryLikeDialogue(closestTile);
+            else if (cropLikeInstance.likeability < 0)
+                dialogue = SelectRandomHateDialogue(closestTile);
+
+            UIManager.Instance.NoticeSimpleLikeability(name, dialogue);
+            UIManager.Instance.NoticeLikeability(closestTile.GetComponentInChildren<CropBehaviour>().cropData.cropName,
+                    closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.likeability);
+        }
+        
+    }
+    
 
     public void DoPlow(Collider2D closestTile)
     {
@@ -347,15 +431,53 @@ public class CharacterFarm : MonoBehaviour
             return; 
         }*/
 
-        if (waterFill.currentWaterAmount <= 0)
+        if (groundCheck.GetOnWater())
         {
+            // 물 위에 있다면, 물 양을 가득 채웁니다.
             waterFill.currentWaterAmount = waterFill.maxWaterAmount;
             UIManager.Instance.UpdateWaterText(waterFill.currentWaterAmount);
+            return; // 충전했으니 함수를 종료합니다.
+        }
+
+        // 2. (물 위에 있지 않을 경우에만 이 코드가 실행됨)
+        // 물 양이 0 이하면 더 이상 진행하지 않고 함수를 종료합니다.
+        // (이 코드는 물을 사용하는 로직으로 추정됩니다.)
+        if (waterFill.currentWaterAmount <= 0)
+        {
             return;
         }
 
         if (closestTile == null) return;
+        if (closestTile.gameObject.GetComponentInChildren<CropBehaviour>() != null && closestTile.GetComponentInChildren<CropBehaviour>().cropData.isGiantCrop)
+        {
+            Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+            SeedLike cropLikeData = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance;
 
+            string name = cropData.cropName;
+            if (closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.isTodayLikeGiven)
+            {
+                string text = $"오늘 {name}에게 이미 물을 주었습니다. ( 현재 호감도: {cropLikeData.likeability} )";
+                UIManager.Instance.NoticeSimpleLikeability(name, text);
+                return; 
+            }
+
+            closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.likeability += 1;
+            UIManager.Instance.NoticeLikeability(closestTile.GetComponentInChildren<CropBehaviour>().cropData.cropName, 
+                closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.likeability);
+
+            string dialogue = "";
+            if (cropLikeData.likeability >= 0 && cropLikeData.likeability < 10)
+                dialogue = SelectRandomSmallLikeDialogue(closestTile);
+            else if (cropLikeData.likeability >= 10 && cropLikeData.likeability < 30)
+                dialogue = SelectRandomMidLikeDialogue(closestTile);
+            else if (cropLikeData.likeability >= 30 && cropLikeData.likeability < 50)
+                dialogue = SelectRandomVeryLikeDialogue(closestTile);
+            else if (cropLikeData.likeability < 0)
+                dialogue = SelectRandomHateDialogue(closestTile);
+
+            UIManager.Instance.NoticeSimpleLikeability(name, dialogue);
+            closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.isTodayLikeGiven = true;
+        }
         closestTile.GetComponent<TilePrefabs>().GetWetByPlayer();
         waterEffect.Play();
         waterFill.currentWaterAmount -= 5;
@@ -526,15 +648,14 @@ public class CharacterFarm : MonoBehaviour
         Seed cropData = crop.cropData;
         TilePrefabs tileInfo = closestTile.GetComponent<TilePrefabs>();
 
-        // ⭐️ 여기가 핵심적인 변경 부분입니다 ⭐️
         if (cropData.isGiantCrop)
         {
-            // 거대 작물일 경우, 확인 창을 띄웁니다.
+            SeedLike seedLike = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance;
+
             UIManager.Instance.ShowConfirmationPopup(
                 onYes: () => {
                     // "예"를 눌렀을 때만 실행될 거대 작물 수확 로직 전체
                     int amountToHarvest = cropData.giantCropYield;
-
                     if (amountToHarvest > 0)
                     {
                         CropManager.Instance.AddHarvestedItem(cropData.harvestedItemID, amountToHarvest);
@@ -565,8 +686,16 @@ public class CharacterFarm : MonoBehaviour
                 onNo: () => {
                     // "아니오"를 누르면 아무것도 하지 않고 로그만 남깁니다.
                     Debug.Log("거대 작물 수확을 취소했습니다.");
+                    Seed giantCrop = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+                    
+                    string name = giantCrop.cropName;
+                    seedLike.likeability -= 5;
+                    string text = $"수확을 시도하여 {name}의 호감도가 크게 감소했습니다. ( 호감도: {seedLike.likeability} )";
+                    UIManager.Instance.NoticeSimpleLikeability(name, text);
+                    UIManager.Instance.NoticeSimpleLikeability(name, SelectRandomHateDialogue(closestTile));
+
                 }
-            );
+            , seedLike.likeability);
         }
         else // 일반 작물일 경우
         {
@@ -643,21 +772,19 @@ public class CharacterFarm : MonoBehaviour
 
         TilePrefabs tileInfo = closestTile.GetComponent<TilePrefabs>();
 
-        // 1. 해당 타일에 이미 허수아비가 있을 경우 -> '제거' 로직만 수행
         if (tileInfo.isOccupiedByScarecrow)
         {
-            // 자식 오브젝트를 안전하게 찾아서 파괴
             ScarecrowScript scarecrow = tileInfo.GetComponentInChildren<ScarecrowScript>();
+
             if (scarecrow != null)
             {
                 Destroy(scarecrow.gameObject);
             }
 
             tileInfo.isOccupiedByScarecrow = false;
-            GameManager.Instance.scarecrowCount++; // 허수아비 개수 복구
-            UIManager.Instance.UpdateInventoryText(); // UI 업데이트
+            GameManager.Instance.scarecrowCount++; 
+            UIManager.Instance.UpdateInventoryText();
 
-            // '제거'를 했으므로 여기서 함수를 종료
             UIManager.Instance.ShowScarecrowMessage("허수아비를 제거했습니다.");
             return;
         }
@@ -668,18 +795,324 @@ public class CharacterFarm : MonoBehaviour
         if (GameManager.Instance.scarecrowCount <= 0)
         {
             UIManager.Instance.ShowScarecrowMessage("허수아비가 부족합니다.");
-            return; // 허수아비가 없으면 함수 종료
+            return; 
         }
         if(tileInfo.isSeedSpawned == true || tileInfo.isDirtSpawned == true)
         {
-            UIManager.Instance.ShowScarecrowMessage("작물이 심어진 타일에는 허수아비를 설치할 수 없습니다.");
+            UIManager.Instance.ShowScarecrowMessage("빈 타일에만 설치할 수 있습니다.");
             return;
         }
-        // 허수아비 설치
+
         Vector3 spawnPosition = closestTile.transform.position;
         Instantiate(scarecrowPrefabs, spawnPosition + Vector3.up * seedSpawnHeight, Quaternion.identity, closestTile.transform);
         tileInfo.isOccupiedByScarecrow = true;
         GameManager.Instance.scarecrowCount--; // 허수아비 개수 차감
         UIManager.Instance.UpdateInventoryText(); // UI 업데이트
     }
+
+    private string SelectRandomMarryDialogue(Collider2D closestTile)
+    {
+        string dialogue = "";
+        Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+        if (cropData.dialoguesForMarry.Length == 0)
+        {
+            dialogue = "대화할 수 있는 대사가 없습니다.";
+            return dialogue;
+        }
+        int randomIndex = Random.Range(0, cropData.dialoguesForMarry.Length);
+        dialogue = cropData.dialoguesForMarry[randomIndex];
+        UIManager.Instance.cropImage.sprite = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.marryImage;
+        UIManager.Instance.cropImage.transform.localScale = new Vector3(0.8f, 1f, 1f);
+        return dialogue;
+    }
+
+    private string SelectRandomSmallLikeDialogue(Collider2D closestTile)
+    {
+        string dialogue = "";
+        Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+        if (cropData.dialoguesForSmallLike.Length == 0)
+        {
+            dialogue = "대화할 수 있는 대사가 없습니다.";
+            return dialogue;
+        }
+        int randomIndex = Random.Range(0, cropData.dialoguesForSmallLike.Length);
+        dialogue = cropData.dialoguesForSmallLike[randomIndex];
+        UIManager.Instance.cropImage.sprite = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.smallLikeImage;
+        return dialogue;
+    }
+
+    private string SelectRandomHateDialogue(Collider2D closestTile)
+    {
+        string dialogue = "";
+        Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+        if (cropData.dialoguesForHate.Length == 0)
+        {
+            dialogue = "대화할 수 있는 대사가 없습니다.";
+            return dialogue;
+        }
+        int randomIndex = Random.Range(0, cropData.dialoguesForHate.Length);
+        dialogue = cropData.dialoguesForHate[randomIndex];
+        UIManager.Instance.cropImage.sprite = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.hateImage;
+        return dialogue;
+    }
+
+    private string SelectRandomMidLikeDialogue(Collider2D closestTile)
+    {
+        string dialogue = "";
+        Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+        if (cropData.dialoguesForMidLike.Length == 0)
+        {
+            dialogue = "대화할 수 있는 대사가 없습니다.";
+            return dialogue;
+        }
+        int randomIndex = Random.Range(0, cropData.dialoguesForMidLike.Length);
+        dialogue = cropData.dialoguesForMidLike[randomIndex];
+        UIManager.Instance.cropImage.sprite = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.midLikeImage;
+        return dialogue;
+    }
+
+    private string SelectRandomVeryLikeDialogue(Collider2D closestTile)
+    {
+        string dialogue = "";
+        Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+        if (cropData.dialoguesForVeryLike.Length == 0)
+        {
+            dialogue = "대화할 수 있는 대사가 없습니다.";
+            return dialogue;
+        }
+        int randomIndex = Random.Range(0, cropData.dialoguesForVeryLike.Length);
+        dialogue = cropData.dialoguesForVeryLike[randomIndex];
+        UIManager.Instance.cropImage.sprite = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.veryLikeImage;
+        return dialogue;
+    }
+
+    private string SelectRandomGoodStuffDialogue(Collider2D closestTile)
+    {
+        string dialogue = "";
+        Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+
+        SeedLike cropLikeData = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance;
+        cropLikeData.likeability += 10;
+        dialogue = $"{cropData.cropName}의 호감도가 10 증가했습니다. ( 현재 호감도: {cropLikeData.likeability} )";
+        UIManager.Instance.NoticeSimpleLikeability(cropData.cropName, dialogue);
+        
+        if (cropData.dialoguesForGoodStuff.Length == 0)
+        {
+            dialogue = "대화할 수 있는 대사가 없습니다.";
+            return dialogue;
+        }
+        int randomIndex = Random.Range(0, cropData.dialoguesForGoodStuff.Length);
+        dialogue = cropData.dialoguesForGoodStuff[randomIndex];
+        UIManager.Instance.cropImage.sprite = cropLikeData.veryLikeImage;
+        return dialogue;
+    }
+
+    private string SelectRandomBadStuffDialogue(Collider2D closestTile)
+    {
+        string dialogue = "";
+        Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+
+        SeedLike cropLikeData = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance;
+        cropLikeData.likeability -= 10;
+        dialogue = $"{cropData.cropName}의 호감도가 10 감소했습니다. ( 현재 호감도: {cropLikeData.likeability} )";
+        UIManager.Instance.NoticeSimpleLikeability(cropData.cropName, dialogue);
+
+        if (cropData.dialoguesForBadStuff.Length == 0)
+        {
+            dialogue = "대화할 수 있는 대사가 없습니다.";
+            return dialogue;
+        }
+        int randomIndex = Random.Range(0, cropData.dialoguesForBadStuff.Length);
+        dialogue = cropData.dialoguesForBadStuff[randomIndex];
+        UIManager.Instance.cropImage.sprite = cropLikeData.hateImage;
+        return dialogue;
+    }
+
+    private string SelectRandomNormalStuffDialogue(Collider2D closestTile)
+    {
+        string dialogue = "";
+        Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+
+        SeedLike cropLikeData = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance;
+        cropLikeData.likeability += 3;
+        dialogue = $"{cropData.cropName}의 호감도가 3 증가했습니다. ( 현재 호감도: {cropLikeData.likeability} )";
+        UIManager.Instance.NoticeSimpleLikeability(cropData.cropName, dialogue);
+
+        if (cropData.dialoguesForNormalStuff.Length == 0)
+        {
+            dialogue = "대화할 수 있는 대사가 없습니다.";
+            return dialogue;
+        }
+        int randomIndex = Random.Range(0, cropData.dialoguesForNormalStuff.Length);
+        dialogue = cropData.dialoguesForNormalStuff[randomIndex];
+        UIManager.Instance.cropImage.sprite = cropLikeData.smallLikeImage;
+        return dialogue;
+    }
+
+    public void GivePesticide(Collider2D closestTile)
+    {
+        if(closestTile != null && closestTile.GetComponentInChildren<CropBehaviour>() != null)
+        {
+            Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+            SeedLike cropLikeData = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance;
+            if(cropData == null || cropLikeData == null)
+                return;
+
+            if (cropLikeData.isTodayAlreadyGift)
+            {
+                string text = $"오늘 이미 {cropData.cropName}에게 선물을 주었습니다. ( 현재 호감도: {cropLikeData.likeability} )";
+                UIManager.Instance.NoticeSimpleLikeability(cropData.name, text);
+                return;
+            }
+
+            if(cropData.isGiantCrop)
+            {
+                cropLikeData.isTodayAlreadyGift = true;
+                string dialogue = $"{cropData.cropName}에게 농약을 주었습니다.";
+                UIManager.Instance.NoticeSimpleLikeability(name, dialogue);
+                
+               if(cropData.cropName == "거대파스닙")
+                {
+                    dialogue = SelectRandomNormalStuffDialogue(closestTile);
+                }
+                else if(cropData.cropName == "거대당근")
+                {
+                    dialogue = SelectRandomNormalStuffDialogue(closestTile);
+                }
+                else if(cropData.cropName == "거대무")
+                {
+                    dialogue = SelectRandomGoodStuffDialogue(closestTile);
+                }
+                else if(cropData.cropName == "거대감자")
+                {
+                    dialogue = SelectRandomGoodStuffDialogue(closestTile);
+                }
+                else if(cropData.cropName == "거대가지")
+                {
+                    dialogue = SelectRandomBadStuffDialogue(closestTile);
+                }
+                else if(cropData.cropName == "거대호박")
+                {
+                    dialogue = SelectRandomBadStuffDialogue(closestTile);
+                }
+
+                UIManager.Instance.NoticeSimpleLikeability(name, dialogue);
+
+                UIManager.Instance.NoticeLikeability(closestTile.GetComponentInChildren<CropBehaviour>().cropData.cropName,
+                        closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.likeability);
+            }
+            GameManager.Instance.pesticideCount--;
+        }
+    }
+
+    public void GiveManure(Collider2D closestTile)
+    {
+        if (closestTile != null && closestTile.GetComponentInChildren<CropBehaviour>() != null)
+        {
+            Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+            SeedLike cropLikeData = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance;
+            if (cropData == null || cropLikeData == null)
+                return;
+
+            if (cropLikeData.isTodayAlreadyGift)
+            {
+                string text = $"오늘 이미 {cropData.cropName}에게 선물을 주었습니다. ( 현재 호감도: {cropLikeData.likeability} )";
+                UIManager.Instance.NoticeSimpleLikeability(cropData.name, text);
+                return;
+            }
+
+            if (cropData.isGiantCrop)
+            {
+                cropLikeData.isTodayAlreadyGift = true;
+                string dialogue = $"{cropData.cropName}에게 거름을 주었습니다.";
+                UIManager.Instance.NoticeSimpleLikeability(name, dialogue);
+
+                if (cropData.cropName == "거대파스닙")
+                {
+                    dialogue = SelectRandomGoodStuffDialogue(closestTile);
+                }
+                else if (cropData.cropName == "거대당근")
+                {
+                    dialogue = SelectRandomGoodStuffDialogue(closestTile);
+                }
+                else if (cropData.cropName == "거대무")
+                {
+                    dialogue = SelectRandomBadStuffDialogue(closestTile);
+                }
+                else if (cropData.cropName == "거대감자")
+                {
+                    dialogue = SelectRandomBadStuffDialogue(closestTile);
+                }
+                else if (cropData.cropName == "거대가지")
+                {
+                    dialogue = SelectRandomNormalStuffDialogue(closestTile);
+                }
+                else if (cropData.cropName == "거대호박")
+                {
+                    dialogue = SelectRandomNormalStuffDialogue(closestTile);
+                }
+
+                UIManager.Instance.NoticeSimpleLikeability(name, dialogue);
+                UIManager.Instance.NoticeLikeability(closestTile.GetComponentInChildren<CropBehaviour>().cropData.cropName,
+                        closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.likeability);
+            }
+            GameManager.Instance.manureCount--;
+        }
+    }
+
+    public void GiveNutrition(Collider2D closestTile)
+    {
+        if (closestTile != null && closestTile.GetComponentInChildren<CropBehaviour>() != null)
+        {
+            Seed cropData = closestTile.GetComponentInChildren<CropBehaviour>().cropData;
+            SeedLike cropLikeData = closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance;
+            if (cropData == null || cropLikeData == null)
+                return;
+
+            if (cropLikeData.isTodayAlreadyGift)
+            {
+                string text = $"오늘 이미 {cropData.cropName}에게 선물을 주었습니다. ( 현재 호감도: {cropLikeData.likeability} )";
+                UIManager.Instance.NoticeSimpleLikeability(cropData.name, text);
+                return;
+            }
+
+            if (cropData.isGiantCrop)
+            {
+                string dialogue = $"{cropData.cropName}에게 영양제를 주었습니다.";
+                cropLikeData.isTodayAlreadyGift = true;
+                UIManager.Instance.NoticeSimpleLikeability(name, dialogue);
+
+                if (cropData.cropName == "거대파스닙")
+                {
+                    dialogue = SelectRandomBadStuffDialogue(closestTile);
+                }
+                else if (cropData.cropName == "거대당근")
+                {
+                    dialogue = SelectRandomBadStuffDialogue(closestTile);
+                }
+                else if (cropData.cropName == "거대무")
+                {
+                    dialogue = SelectRandomNormalStuffDialogue(closestTile);
+                }
+                else if (cropData.cropName == "거대감자")
+                {
+                    dialogue = SelectRandomNormalStuffDialogue(closestTile);
+                }
+                else if (cropData.cropName == "거대가지")
+                {
+                    dialogue = SelectRandomGoodStuffDialogue(closestTile);
+                }
+                else if (cropData.cropName == "거대호박")
+                {
+                    dialogue = SelectRandomGoodStuffDialogue(closestTile);
+                }
+
+                UIManager.Instance.NoticeSimpleLikeability(name, dialogue);
+                UIManager.Instance.NoticeLikeability(closestTile.GetComponentInChildren<CropBehaviour>().cropData.cropName,
+                        closestTile.GetComponentInChildren<CropBehaviour>().cropLikeInstance.likeability);
+            }
+            GameManager.Instance.nutritionCount--;
+        }
+    }
+
 }

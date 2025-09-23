@@ -93,7 +93,7 @@ public class TilePrefabs : MonoBehaviour
 
     private void DryForDayStart(int newday)
     {
-        Dry();
+        // Dry();
     }
     private void Dry()
     {
@@ -108,8 +108,22 @@ public class TilePrefabs : MonoBehaviour
     }
     public void DayChangeHappend(int newDay)
     {
+        SeedLike cropLikeData = null;
+        if (gameObject.GetComponentInChildren<CropBehaviour>() != null)
+            cropLikeData = gameObject.GetComponentInChildren<CropBehaviour>().cropLikeInstance;
+
         if (isWatered && gameObject.GetComponentInChildren<CropBehaviour>()!=null)
             gameObject.GetComponentInChildren<CropBehaviour>().Grow(newDay);
+
+        if (cropLikeData != null && gameObject.GetComponentInChildren<CropBehaviour>().cropData.isGiantCrop)
+        {  
+            if(!cropLikeData.isTodayAlreadyTalk)
+                cropLikeData.likeability -= 5; // 오늘 대화 안했을 때 호감도 감소
+            cropLikeData.isTodayLikeGiven = false; 
+            cropLikeData.isTodayAlreadyTalk = false; 
+            cropLikeData.isTodayAlreadyGift = false;
+        }
+
     }
 
     public void GetFertilized()

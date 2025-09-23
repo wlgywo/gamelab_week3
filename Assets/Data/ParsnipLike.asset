@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19fc415d1c17bfd48be3358a81891770, type: 3}
+  m_Name: ParsnipLike
+  m_EditorClassIdentifier: 
+  likeability: 0
+  isTodayLikeGiven: 0
+  isTodayAlreadyTalk: 0
+  isTodayAlreadyGift: 0
+  hateImage: {fileID: -5034953499350411472, guid: eba1df4113f27cd46a63918bc65bc941, type: 3}
+  smallLikeImage: {fileID: -5034953499350411472, guid: eba1df4113f27cd46a63918bc65bc941, type: 3}
+  midLikeImage: {fileID: -5034953499350411472, guid: eba1df4113f27cd46a63918bc65bc941, type: 3}
+  veryLikeImage: {fileID: -5034953499350411472, guid: eba1df4113f27cd46a63918bc65bc941, type: 3}
+  marryImage: {fileID: -5034953499350411472, guid: eba1df4113f27cd46a63918bc65bc941, type: 3}

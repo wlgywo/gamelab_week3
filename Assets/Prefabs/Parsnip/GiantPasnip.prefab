@@ -65,9 +65,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropData: {fileID: 11400000, guid: b53728a1f8263b54eb7edd342fd17627, type: 2}
+  originalCropLike: {fileID: 11400000, guid: fe6d4843e8b815d4996cba02d06248e1, type: 2}
+  cropLikeInstance: {fileID: 0}
   growthStageObjects:
   - {fileID: 7973899316990424378, guid: 9b778861c29b38546b4ebeac31cad3e3, type: 3}
   - {fileID: 497801509497340413}
+  daysSincePlanted: 0
   isEaten: 0
 --- !u!61 &8783814681760948646
 BoxCollider2D:

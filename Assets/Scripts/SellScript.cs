@@ -63,6 +63,7 @@ public class SellScript : MonoBehaviour
         {
             UIManager.Instance.ShowSellNoticeText();
             isPlayerInRange = true;
+            InputManager.Instance.isPlayerInputLocked = UIManager.Instance.sellUI.activeSelf;
         }
     }
 
@@ -75,6 +76,7 @@ public class SellScript : MonoBehaviour
             if (UIManager.Instance.sellUI.activeSelf)
             {
                 UIManager.Instance.sellUI.SetActive(false);
+                InputManager.Instance.isPlayerInputLocked = UIManager.Instance.sellUI.activeSelf;
             }
             isPlayerInRange = false;
         }

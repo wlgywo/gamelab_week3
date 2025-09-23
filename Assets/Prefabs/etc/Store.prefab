@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6949455509414420294}
   - component: {fileID: 8347468196023912020}
   - component: {fileID: 2170060793936431969}
+  - component: {fileID: 1975164982117485976}
   m_Layer: 0
   m_Name: Store
   m_TagString: Untagged
@@ -100,3 +101,62 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 151171c0ef719944cb676bf9b0bf8277, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPlayerInRange: 0
+  fertilizerPrice: 90
+  parsnipSeedPrice: 15
+  carrotSeedPrice: 30
+  radishSeedPrice: 50
+  potatoSeedPrice: 80
+  eggplantSeedPrice: 130
+  pumpkinSeedPrice: 200
+  prayRainPrice: 1000
+  scarecrowPrice: 450
+  pesticidePrice: 500
+  nutritionPrice: 200
+  manurePrice: 350
+--- !u!61 &1975164982117485976
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6650767320037561467}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.0053777695, y: 0.009836733}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.0537434, y: 1.0196733}
+  m_EdgeRadius: 0

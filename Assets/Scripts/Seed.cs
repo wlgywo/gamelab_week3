@@ -35,4 +35,18 @@ public class Seed : ScriptableObject
 
     [Tooltip("이 작물이 변할 수 있는 거대 작물 프리팹. 거대 작물이 없다면 비워두세요.")]
     public GameObject giantVersionPrefab;
+
+    
+
+    [Header("호감도")]
+    //public int likeability;
+    //public bool isTodayLikeGiven = false;
+    public string[] dialoguesForSmallLike; // 예: ["고마워!", "이거 정말 좋아해!"]
+    public string[] dialoguesForHate;
+    public string[] dialoguesForMidLike;
+    public string[] dialoguesForVeryLike;
+    public string[] dialoguesForGoodStuff;
+    public string[] dialoguesForBadStuff;
+    public string[] dialoguesForNormalStuff;
+    public string[] dialoguesForMarry;
 }

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19fc415d1c17bfd48be3358a81891770, type: 3}
+  m_Name: RadishLike
+  m_EditorClassIdentifier: 
+  likeability: 0
+  isTodayLikeGiven: 0
+  isTodayAlreadyTalk: 0
+  isTodayAlreadyGift: 0
+  hateImage: {fileID: -5643665732318885983, guid: 122e5a5cd2ec4b047a1966975503fb36, type: 3}
+  smallLikeImage: {fileID: -3787463678940181590, guid: bfbbb696c69556543b3d1b70eb589d57, type: 3}
+  midLikeImage: {fileID: 9057483007168365329, guid: 0d038434ec08c1246984023dbd5465d1, type: 3}
+  veryLikeImage: {fileID: 3313450955192952311, guid: 89bbba4c70cd7614da4a6810ea254ad7, type: 3}
+  marryImage: {fileID: 2367018697201733980, guid: 74b38ed026daab64da34fc2554161852, type: 3}

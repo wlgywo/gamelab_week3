@@ -13,6 +13,7 @@ public class WeatherManager : MonoBehaviour
 
     public event Action OnRainStarted;
     public event Action OnRainStopped;
+    public event Action DryEvent;
 
     private void Awake()
     {
@@ -39,6 +40,7 @@ public class WeatherManager : MonoBehaviour
     }
     public void SetRain(int newday)
     {
+        DryEvent?.Invoke();
         float randomValue = UnityEngine.Random.Range(0f, 1f);
 
         if (randomValue < probability)

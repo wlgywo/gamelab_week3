@@ -6,8 +6,8 @@ using System.Collections;
 public class TimeManager : MonoBehaviour
 {
     public static TimeManager Instance { get; private set; }
-    public const int HOURS_PER_DAY = 3;
-    public const float SECONDS_PER_HOUR = 10f; // 1시간
+    public const int HOURS_PER_DAY = 24;
+    public const float SECONDS_PER_HOUR = 12f; // 1시간
 
     //매 시간 변경될 때 호출되는 이벤 (인자: 새로운 시간)
     public event Action<int> OnHourChanged;
@@ -20,7 +20,7 @@ public class TimeManager : MonoBehaviour
     private bool _isTransitioningDay = false;
     public bool canProceedToNextDay = false;
 
-    public int CurrentHour { get; private set; } = 1; 
+    public int CurrentHour { get; private set; } = 6; 
     public int CurrentDay { get; private set; } = 1;
 
     private void Awake()

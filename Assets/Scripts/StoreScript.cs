@@ -7,15 +7,18 @@ public class StoreScript : MonoBehaviour
     [SerializeField] private bool isPlayerInRange = false;
 
     [Header("상점 아이템 가역")]
-    [SerializeField] private int fertilizerPrice = 50;
-    [SerializeField] private int parsnipSeedPrice = 20;
-    [SerializeField] private int carrotSeedPrice = 30;
-    [SerializeField] private int radishSeedPrice = 40;
-    [SerializeField] private int potatoSeedPrice = 40;
-    [SerializeField] private int eggplantSeedPrice = 40;
-    [SerializeField] private int pumpkinSeedPrice = 40;
-    [SerializeField] private int prayRainPrice = 100;
-    [SerializeField] private int scarecrowPrice = 200;
+    [SerializeField] public int fertilizerPrice = 90;
+    [SerializeField] public int parsnipSeedPrice = 15;
+    [SerializeField] public int carrotSeedPrice = 30;
+    [SerializeField] public int radishSeedPrice = 50;
+    [SerializeField] public int potatoSeedPrice = 80;
+    [SerializeField] public int eggplantSeedPrice = 130;
+    [SerializeField] public int pumpkinSeedPrice = 200;
+    [SerializeField] public int prayRainPrice = 1000;
+    [SerializeField] public int scarecrowPrice = 450;
+    [SerializeField] public int pesticidePrice = 500;
+    [SerializeField] public int nutritionPrice = 200;
+    [SerializeField] public int manurePrice = 350;
     void Start()
     {
         if (InputManager.Instance != null)
@@ -46,6 +49,7 @@ public class StoreScript : MonoBehaviour
         {
             UIManager.Instance.ShowStoreNoticeText();
             isPlayerInRange = true;
+            InputManager.Instance.isPlayerInputLocked = UIManager.Instance.storeUI.activeSelf;
         }
     }
 
@@ -53,10 +57,12 @@ public class StoreScript : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            if(UIManager.Instance == null) return;
             UIManager.Instance.HideStoreNoticeText();
             if (UIManager.Instance.storeUI.activeSelf)
             {
                 UIManager.Instance.storeUI.SetActive(false);
+                InputManager.Instance.isPlayerInputLocked = UIManager.Instance.storeUI.activeSelf;
             }
             isPlayerInRange = false;
         }
@@ -214,6 +220,53 @@ public class StoreScript : MonoBehaviour
         else
         {
 
+        }
+    }
+
+    public void BuyPesticide()
+    {
+        int currentPlayerMoney = GameManager.Instance.playerMoney;
+        if (currentPlayerMoney >= pesticidePrice)
+        {
+            GameManager.Instance.playerMoney -= pesticidePrice;
+            GameManager.Instance.pesticideCount++;
+
+            UIManager.Instance.UpdateMoneyText();
+            UIManager.Instance.UpdateInventoryText();
+        }
+        else
+        {
+        }
+    }
+
+    public void BuyNutrition()
+    {
+        int currentPlayerMoney = GameManager.Instance.playerMoney;
+        if (currentPlayerMoney >= nutritionPrice)
+        {
+            GameManager.Instance.playerMoney -= nutritionPrice;
+            GameManager.Instance.nutritionCount++;
+
+            UIManager.Instance.UpdateMoneyText();
+            UIManager.Instance.UpdateInventoryText();
+        }
+        else
+        {
+        }
+    }
+
+    public void BuyManure()
+    {
+        int currentPlayerMoney = GameManager.Instance.playerMoney;
+        if (currentPlayerMoney >= manurePrice)
+        {
+            GameManager.Instance.playerMoney -= manurePrice;
+            GameManager.Instance.manureCount++;
+            UIManager.Instance.UpdateMoneyText();
+            UIManager.Instance.UpdateInventoryText();
+        }
+        else
+        {
         }
     }
 }

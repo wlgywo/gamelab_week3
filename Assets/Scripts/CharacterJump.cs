@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class CharacterJump : MonoBehaviour
 {
@@ -37,6 +38,10 @@ public class CharacterJump : MonoBehaviour
     private bool pressingJump;
     public bool onGround;
     private bool currentlyJumping;
+
+    [Header("Platform Drop Down")]
+    private Collider2D currentPlatform = null; // 현재 밟고 있는 발판의 콜라이더
+    private bool isJumpingDown = false; // 아래로 점프 중인지 확인
 
     private void Awake()
     {
@@ -95,6 +100,17 @@ public class CharacterJump : MonoBehaviour
     {
         setPhysics();
         onGround = ground.GetOnGround();
+
+        // 아래 방향 키를 눌렀을 때
+        // GetKey"Down"은 키를 누르는 첫 프레임만 감지합니다.
+        // Input System을 사용한다면 해당 액션에 연결된 메서드에서 호출합니다.
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            if (currentPlatform != null)
+            {
+                StartCoroutine(DisablePlatformCollision());
+            }
+        }
 
         // 널널한 점프
         if (jumpBuffer > 0)
@@ -246,6 +262,46 @@ public class CharacterJump : MonoBehaviour
     public void bounceUp(float bounceAmount)
     {
         rb.AddForce(Vector2.up * bounceAmount, ForceMode2D.Impulse);
+    }
+
+
+    // 낮점 로직
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // 충돌한 오브젝트에 Platform Effector 2D가 있는지 확인
+        if (collision.gameObject.GetComponent<PlatformEffector2D>() != null)
+        {
+            // 현재 밟고 있는 발판으로 설정
+            currentPlatform = collision.collider;
+        }
+    }
+
+    // 발판에서 떨어졌을 때 호출
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        // 떨어지려는 발판이 현재 밟고 있는 발판 정보와 일치하면 초기화
+        if (collision.collider == currentPlatform)
+        {
+            currentPlatform = null;
+        }
+    }
+
+    // 발판 콜라이더를 잠시 끄는 코루틴
+    private IEnumerator DisablePlatformCollision()
+    {
+        // 아래로 점프하는 동안에는 발판을 감지하지 못하도록 함
+        Collider2D platformToFallThrough = currentPlatform;
+        isJumpingDown = true;
+
+        // 발판의 콜라이더를 비활성화
+        platformToFallThrough.enabled = false;
+
+        // 아주 짧은 시간(0.3초) 동안 기다립니다. 플레이어가 발판을 통과하기에 충분한 시간입니다.
+        yield return new WaitForSeconds(0.3f);
+
+        // 다시 콜라이더를 활성화해서 다른 오브젝트들이나 플레이어가 다시 밟을 수 있게 합니다.
+        platformToFallThrough.enabled = true;
+        isJumpingDown = false;
     }
 }
 

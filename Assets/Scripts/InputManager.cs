@@ -22,6 +22,7 @@ public class InputManager : MonoBehaviour
     public event Action HitClick;
     public event Action DoPlant;
     public event Action<int> ChangeModeType;
+    public event Action<Vector2> ChangeModeScroll;
 
     [SerializeField] public bool isDragging = false; // 드래그 여부
     [SerializeField] public bool isClick = false; // 클릭 여부
@@ -66,7 +67,9 @@ public class InputManager : MonoBehaviour
         playerInput.Player.MovementHoriAxis.canceled += OnHoriAxis;
         playerInput.Player.Interaction.performed += OnInteract;
         playerInput.Player.ModeSwitch.performed += SwitchMode;
+        playerInput.Player.ModeScroll.performed += ctx => ChangeModeScroll?.Invoke(ctx.ReadValue<Vector2>());
         playerInput.UI.SpaceContinue.performed += OnContinue;
+        playerInput.Player.DebugMode.performed += IntoDebugMode;
 
     }
 
@@ -88,6 +91,8 @@ public class InputManager : MonoBehaviour
         playerInput.Player.Interaction.performed -= OnInteract;
         playerInput.Player.ModeSwitch.performed -= SwitchMode;
         playerInput.UI.SpaceContinue.performed -= OnContinue;
+        playerInput.Player.ModeScroll.performed -= ctx => ChangeModeScroll?.Invoke(ctx.ReadValue<Vector2>());
+        playerInput.Player.DebugMode.performed -= IntoDebugMode;
 
         playerInput.Player.Disable();
     }
@@ -329,7 +334,7 @@ public class InputManager : MonoBehaviour
 
     private void SwitchMode(InputAction.CallbackContext context)
     {
-        string keyName = context.control.name;
+        /*string keyName = context.control.name;
         if (int.TryParse(keyName, out int numberValue))
         {
             ChangeModeType?.Invoke(numberValue);
@@ -346,11 +351,19 @@ public class InputManager : MonoBehaviour
                     numberValue = 12;
                     ChangeModeType?.Invoke(numberValue);
                     break;
+                case "f3":
+                    numberValue = 13;
+                    ChangeModeType?.Invoke(numberValue);
+                    break;
+                case "f4":
+                    numberValue = 14;
+                    ChangeModeType?.Invoke(numberValue);
+                    break;
                 default:
                     Debug.LogWarning($"처리할 수 없는 키 입력입니다: '{context.control.name}'");
                     break;
             }
-        }
+        }*/
     }
 
     private void OnContinue(InputAction.CallbackContext context)
@@ -363,4 +376,15 @@ public class InputManager : MonoBehaviour
     //{
     //    MovementAD?.Invoke(0f);
     //}
+
+    private void IntoDebugMode(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            GameManager.Instance.playerMoney += 100000;
+            UIManager.Instance.UpdateMoneyText();
+            FairyManager.Instance.fairyAppearChance = 1.0f;
+            GiantCropManager.Instance.giantCropChance = 1.0f;
+        }
+    }
 }
